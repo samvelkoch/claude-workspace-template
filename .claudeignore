@@ -1,0 +1,10 @@
+data/raw/
+*.csv
+*.parquet
+*.pkl
+*.feather
+.env
+*secret*
+*credential*
+__pycache__/
+.ipynb_checkpoints/
