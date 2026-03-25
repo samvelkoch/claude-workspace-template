@@ -35,7 +35,7 @@ project/
 
 **Токены и подключения:**
 - `~/.confluence_token` — токен Confluence (chmod 600)
-- `db_mow2bi2.py` в корне claude-workspace — подключение к DWH mow2bi2
+- подключения к БД — модули в корне claude-workspace
 
 **Корневой контекст:**
 - `claude-workspace/CLAUDE.md` — роль, стек, общие правила окружения
