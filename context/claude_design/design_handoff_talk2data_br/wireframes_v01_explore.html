@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Talk2Data BR — Wireframes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f7f5f0; --paper-2:#efece4; --paper-3:#e7e3d7;
+  --ink:#1a1a1a; --ink-2:#4a4a48; --ink-3:#8a8a85;
+  --line:#cfcabb; --line-2:#e6e2d7;
+  --marker:#e6c14a; --marker-soft:#f5ecc4;
+  --red:#c0432a; --blue:#3658a4; --green:#3f7a3a;
+  --user:#e9e5d8; --bot:transparent;
+}
+[data-theme="dark"]{
+  --paper:#16161a; --paper-2:#1f1f24; --paper-3:#28282e;
+  --ink:#ececec; --ink-2:#bdbdbb; --ink-3:#75756f;
+  --line:#3a3a3e; --line-2:#2a2a2e;
+  --marker:#d8b13a; --marker-soft:#3a3525;
+  --red:#e6745c; --blue:#86a8e6; --green:#7cb377;
+  --user:#28282e; --bot:transparent;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(0,0,0,.022) 31px 32px)}
+[data-theme="dark"] body{background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(255,255,255,.025) 31px 32px)}
+a{color:inherit}
+
+/* ====== TOP DECK ====== */
+.deck{max-width:1320px;margin:0 auto;padding:36px 28px 18px;border-bottom:1px dashed var(--line)}
+.deck h1{font-family:'Caveat',cursive;font-size:46px;font-weight:700;margin:0 0 4px;letter-spacing:.5px}
+.deck .lede{font-family:'Caveat',cursive;font-size:21px;color:var(--ink-2);max-width:780px;line-height:1.3}
+.deck .meta{font-family:Inter,sans-serif;font-size:11.5px;color:var(--ink-3);margin-top:14px;display:flex;gap:18px;flex-wrap:wrap;text-transform:uppercase;letter-spacing:.06em}
+.toc{display:flex;gap:6px 14px;flex-wrap:wrap;font-family:Inter,sans-serif;font-size:11.5px;margin:14px 0 0}
+.toc a{color:var(--ink-2);text-decoration:none;border-bottom:1px dashed var(--ink-3);padding-bottom:1px}
+.toc a:hover{color:var(--ink);border-color:var(--ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:Inter,sans-serif;font-size:11px;color:var(--ink-2);margin-top:12px}
+.legend .it{display:flex;align-items:center;gap:6px}
+.legend .sw{width:14px;height:14px;border:1px solid var(--line);border-radius:3px;flex-shrink:0}
+
+/* ====== OWUI SHELL ====== */
+.owui{display:grid;grid-template-columns:240px 1fr;max-width:1320px;margin:0 auto;border-left:1px dashed var(--line);border-right:1px dashed var(--line);min-height:100vh}
+.sb{border-right:1px dashed var(--line);padding:14px 14px 24px;font-family:Inter,sans-serif;font-size:13px;color:var(--ink-2);position:sticky;top:0;align-self:start;height:100vh;overflow:hidden}
+.sb-logo{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink);margin-bottom:14px}
+.sb-logo .dot{width:18px;height:18px;border-radius:5px;background:var(--ink)}
+.sb-search{border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--ink-3);font-size:12px;margin-bottom:10px}
+.sb h5{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:14px 0 4px;font-weight:600}
+.sb-item{padding:5px 8px;border-radius:5px;color:var(--ink-2);display:flex;align-items:center;gap:8px;font-size:13px}
+.sb-item.active{background:var(--user);color:var(--ink)}
+.sb-item .ic{width:14px;height:14px;border:1px solid var(--ink-3);border-radius:3px;flex-shrink:0}
+.sb-foot{position:absolute;bottom:14px;left:14px;right:14px;border-top:1px dashed var(--line);padding-top:10px;display:flex;align-items:center;gap:8px}
+.sb-avatar{width:26px;height:26px;border-radius:50%;background:var(--user);border:1px solid var(--line)}
+
+.hdr{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px dashed var(--line);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;font-family:Inter,sans-serif;font-size:13px}
+.hdr .title{color:var(--ink);font-weight:500}
+.hdr .model{border:1px solid var(--line);border-radius:5px;padding:3px 10px;font-size:12px;color:var(--ink-2)}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.hdr-btn{width:28px;height:28px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;font-size:14px;color:var(--ink-2)}
+
+.chat{padding:0 24px 80px}
+
+/* ====== SCENE / VARIANT ====== */
+.scene{border:1px dashed var(--line);background:var(--paper);margin:32px 0;padding:24px 28px 30px;position:relative;border-radius:2px}
+.scene-tag{position:absolute;top:-15px;left:24px;background:var(--paper);padding:0 12px;font-family:'Caveat',cursive;font-size:24px;color:var(--ink);font-weight:700;letter-spacing:.5px}
+.scene-tag .num{color:var(--red);margin-right:6px}
+.scene-sub{font-family:'Caveat',cursive;font-size:18px;color:var(--ink-3);margin:0 0 16px;font-weight:400;line-height:1.25}
+.scene-q{font-family:'Caveat',cursive;font-size:17px;color:var(--ink-2);margin:0 0 14px;border-left:3px solid var(--marker);padding:6px 12px;background:var(--marker-soft)}
+
+.variants{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:14px}
+.variants.cols-1{grid-template-columns:1fr}
+
+.v{border:1px solid var(--line);border-radius:8px;padding:14px 16px 16px;background:var(--paper);position:relative;display:flex;flex-direction:column;gap:8px;min-width:0}
+.v-label{font-family:'Caveat',cursive;font-size:19px;color:var(--ink);font-weight:700;display:flex;align-items:baseline;gap:8px;margin:0 0 4px}
+.v-label .num{background:var(--marker);color:#1a1a1a;width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-family:Inter,sans-serif;font-size:11px;font-weight:700;flex-shrink:0}
+.v-label small{font-family:Inter,sans-serif;font-size:10.5px;color:var(--ink-3);font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-left:auto;text-align:right;line-height:1.2;max-width:60%}
+.v-foot{font-family:'Caveat',cursive;font-size:15px;color:var(--red);margin-top:auto;padding-top:6px;line-height:1.2}
+.v-foot::before{content:"↳ ";color:var(--red);font-weight:700}
+
+/* ====== CHAT ELEMENTS ====== */
+.msg{display:flex;gap:10px;margin:8px 0;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.av{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--paper-2);flex-shrink:0;display:grid;place-items:center;font-family:Inter,sans-serif;font-size:9.5px;color:var(--ink-3);font-weight:600}
+.msg.user .av{background:var(--user);color:var(--ink)}
+.bubble{max-width:92%;padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.55;min-width:0}
+.bot .bubble{border:1px dashed var(--line)}
+.user .bubble{background:var(--user)}
+.bubble.wide{width:100%;max-width:100%;padding:6px}
+
+.h{font-weight:700;font-size:13.5px;margin:6px 0 4px;color:var(--ink)}
+.h.lg{font-size:15px}
+.muted{color:var(--ink-3)}
+.kbd{font-family:'JetBrains Mono',monospace;background:var(--paper-2);border:1px solid var(--line);border-radius:3px;padding:0 5px;font-size:11.5px}
+
+table.md{width:100%;border-collapse:collapse;margin:6px 0;font-size:12px;table-layout:fixed}
+table.md th, table.md td{border:1px solid var(--line);padding:4px 7px;text-align:left;vertical-align:top;overflow:hidden;text-overflow:ellipsis;word-wrap:break-word}
+table.md th{background:var(--paper-2);font-weight:600}
+table.md.sm{font-size:11.5px}
+table.md.sm th, table.md.sm td{padding:3px 6px}
+
+pre.code{font-family:'JetBrains Mono',monospace;background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;white-space:pre;overflow-x:auto;font-size:11.5px;line-height:1.45;margin:6px 0;color:var(--ink)}
+
+.cb{display:flex;align-items:flex-start;gap:8px;margin:2px 0;font-size:12.5px}
+.cb-box{width:13px;height:13px;border:1.2px solid var(--ink);border-radius:3px;flex-shrink:0;margin-top:3px;display:grid;place-items:center;font-size:10px;font-weight:700;line-height:1}
+.cb.checked .cb-box{background:var(--ink);color:var(--paper)}
+.cb.dim{color:var(--ink-3)}
+
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+.btn{border:1px solid var(--ink);border-radius:18px;padding:4px 12px;font-size:11.5px;background:transparent;color:var(--ink);font-family:Inter,sans-serif;line-height:1.5}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.marker{background:var(--marker-soft);border-color:var(--marker);color:var(--ink)}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn.icon{padding:4px 10px}
+
+.note{font-family:'Caveat',cursive;color:var(--red);font-size:16px;line-height:1.25;font-weight:600}
+.note-row{display:flex;gap:8px;align-items:flex-start;margin:8px 0 0}
+.note-row .arrow{font-family:'Caveat',cursive;color:var(--red);font-size:22px;line-height:1;flex-shrink:0}
+.callout{border-left:3px solid var(--red);padding:6px 0 6px 12px;margin:8px 0;background:var(--paper-2);font-size:12.5px;border-radius:0 4px 4px 0}
+.callout.ok{border-color:var(--green)}
+.callout.warn{border-color:var(--marker)}
+
+.iframe-ph{border:1.5px dashed var(--ink-3);background:repeating-linear-gradient(135deg,transparent 0 8px,var(--line-2) 8px 9px);border-radius:4px;padding:14px;font-size:11.5px;color:var(--ink-2);margin:6px 0}
+.iframe-ph .lbl{font-family:'Caveat',cursive;font-size:17px;color:var(--ink);display:block;margin-bottom:4px;line-height:1.1}
+
+.slide-ph{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;aspect-ratio:16/9;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:10px;color:var(--ink-3);padding:8px;text-align:center;font-family:Inter,sans-serif;overflow:hidden}
+.slide-ph .t{font-family:'Caveat',cursive;font-size:15px;color:var(--ink);font-weight:600}
+.slide-ph .bars{display:flex;gap:2px;align-items:flex-end;height:18px;margin-top:6px}
+.slide-ph .bars span{width:5px;background:var(--ink-3);display:block}
+
+.composer{margin:18px 0 0;border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:10px 14px;display:flex;align-items:center;gap:10px;font-family:Inter,sans-serif}
+.composer .clip{width:26px;height:26px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--ink-2);font-size:13px}
+.composer .input{flex:1;color:var(--ink-3);font-size:12.5px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-height:20px}
+.composer .send{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:14px}
+
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11.5px;background:var(--paper-2);font-family:'JetBrains Mono',monospace}
+.chip .ext{background:#1f7d3a;color:#fff;border-radius:2px;padding:0 4px;font-size:9.5px;font-weight:700;font-family:Inter}
+.chip .ext.bad{background:#c0432a}
+
+.status{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:7px;font-style:italic;margin:3px 0;font-family:Inter,sans-serif}
+.status .spin{width:9px;height:9px;border:1.4px solid var(--ink-3);border-top-color:transparent;border-radius:50%;animation:spin 1.2s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status.done{color:var(--ink-2)}
+.status.done .spin{background:var(--green);border-color:var(--green);animation:none;border-top-color:var(--green)}
+
+/* contrast strip — schematic mockup of message in chat */
+.bg-sketch{padding:4px;border-radius:6px;background:repeating-linear-gradient(45deg,var(--paper) 0 6px,var(--paper-2) 6px 7px)}
+
+/* zoom bar */
+#tw-toggle{position:fixed;bottom:18px;right:18px;background:var(--ink);color:var(--paper);border:none;border-radius:24px;padding:10px 16px;font-family:Inter,sans-serif;font-size:12px;cursor:pointer;z-index:50;box-shadow:0 6px 20px -8px rgba(0,0,0,.4)}
+
+@media (max-width:980px){
+  .owui{grid-template-columns:1fr}
+  .sb{display:none}
+  .variants{grid-template-columns:1fr}
+}
+
+/* small util grid for slide previews */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+
+/* tweaks panel */
+.tw-panel{position:fixed;right:18px;bottom:62px;z-index:60;width:240px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px -12px rgba(0,0,0,.3);font-family:Inter,sans-serif;font-size:12.5px;padding:14px 16px}
+.tw-panel h6{margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.tw-row{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px}
+.tw-seg{display:flex;gap:6px}
+.tw-seg button{flex:1;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;font-size:12px}
+.tw-seg button.on{background:var(--ink);color:var(--paper)}
+</style>
+</head>
+<body data-theme="light">
+
+<!-- ============ DECK / TOC ============ -->
+<section class="deck">
+  <h1>Talk2Data Excel BR · wireframes</h1>
+  <div class="lede">Все экраны — внутри стандартного Open WebUI чата. Никакого кастомного фронта. Markdown, Rich UI embeds (HTMLResponse iframe), inline-кнопки через <span class="kbd">__event_call__</span>, статусы через <span class="kbd">__event_emitter__</span>. По 4 варианта на ключевой экран — чтобы быстро выбрать направление.</div>
+  <div class="meta">
+    <span>v0.2 · wireframe</span>
+    <span>OWUI 0.5+</span>
+    <span>QWEN local proxy</span>
+    <span>FastAPI tool</span>
+    <span>Marp HTML output</span>
+  </div>
+  <div class="toc">
+    <a href="#s01">01 Онбординг</a>
+    <a href="#s02">02 Свободный чат</a>
+    <a href="#s03">03 Выбор сценария BR</a>
+    <a href="#s04">04 Шаблонный BR</a>
+    <a href="#s05">05 Интервью</a>
+    <a href="#s06">06 Каталог вопросов</a>
+    <a href="#s07">07 Ссылка на презентацию</a>
+    <a href="#s08">08 Edge cases</a>
+  </div>
+  <div class="legend">
+    <div class="it"><span class="sw" style="background:var(--marker-soft);border-color:var(--marker)"></span> Pure Markdown</div>
+    <div class="it"><span class="sw" style="background:repeating-linear-gradient(135deg,transparent 0 4px,var(--line) 4px 5px)"></span> Rich UI embed (HTMLResponse iframe)</div>
+    <div class="it"><span class="sw" style="background:var(--ink);border-color:var(--ink)"></span> __event_call__ inline button</div>
+    <div class="it"><span class="sw" style="border-style:dashed"></span> __event_emitter__ status</div>
+  </div>
+</section>
+
+<!-- ============ OWUI SHELL ============ -->
+<div class="owui">
+  <aside class="sb">
+    <div class="sb-logo"><span class="dot"></span> Open WebUI</div>
+    <div class="sb-search">⌕  Search</div>
+    <div class="sb-item active"><span class="ic"></span> + New chat</div>
+    <h5>Workspace</h5>
+    <div class="sb-item"><span class="ic"></span> Models</div>
+    <div class="sb-item"><span class="ic"></span> Knowledge</div>
+    <div class="sb-item"><span class="ic"></span> Notes</div>
+    <h5>Recent</h5>
+    <div class="sb-item">X5 — Q1 BR draft</div>
+    <div class="sb-item">Корп-тревел сравнение</div>
+    <div class="sb-item">S&amp;M отчёт мар.26</div>
+    <div class="sb-item">Топ направления Q4</div>
+    <div class="sb-item">Сергей · командировки</div>
+    <div class="sb-foot">
+      <div class="sb-avatar"></div>
+      <div>analyst@x5</div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="hdr">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="title">Talk2Data — Q1.26 review</div>
+        <div class="model">qwen-talk2data ▾</div>
+      </div>
+      <div class="hdr-right">
+        <div class="hdr-btn">⤓</div>
+        <div class="hdr-btn">⋯</div>
+        <div class="hdr-btn">◐</div>
+      </div>
+    </header>
+
+    <section class="chat">
+
+<!-- ============================================================ -->
+<!-- 01 · ОНБОРДИНГ                                               -->
+<!-- ============================================================ -->
+<section class="scene" id="s01">
+  <div class="scene-tag"><span class="num">01</span> · Онбординг — первый аплоад</div>
+  <div class="scene-sub">пользователь только что открыл чат «Talk2Data». Модель встречает, объясняет что умеет, ждёт Excel. После аплоада — статусы парсинга и три пути дальше.</div>
+
+  <div class="scene-q">какой ключевой вопрос: сколько объяснять до файла, и какие три CTA показать после?</div>
+
+  <div class="variants">
+
+    <!-- 1a — short greeting + immediate prompt to attach -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>Короткое приветствие<small>plain MD · минимум friction</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Привет, я Talk2Data.</div>
+        Прикрепите Excel-файл, и я отвечу на вопросы по нему текстом или соберу Business Review.
+        <div style="margin-top:6px" class="muted">— поддерживаю .xlsx · до 500 MB · до 2M строк</div>
+      </div></div>
+      <div class="composer">
+        <div class="clip">📎</div>
+        <div class="input"><span class="muted">Прикрепить файл и спросить...</span></div>
+        <div class="send">↑</div>
+      </div>
+      <div class="v-foot">первое сообщение модели — system prompt. без меню, без эмодзи.</div>
+    </div>
+
+    <!-- 1b — onboarding card with capabilities -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Карточка «что умею»<small>structured · сразу видна область применения</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Talk2Data · Excel → ответы и Business Review</div>
+        <table class="md sm"><tr><td style="width:24px">·</td><td><b>Свободный чат</b> — вопросы по таблице</td></tr>
+          <tr><td>·</td><td><b>BR-шаблон</b> — Exec / Operational / Client</td></tr>
+          <tr><td>·</td><td><b>BR-интервью</b> — соберём под аудиторию</td></tr>
+          <tr><td>·</td><td><b>BR-каталог</b> — 32 готовых вопроса</td></tr></table>
+        <div style="margin-top:4px" class="muted">Прикрепите .xlsx чтобы начать ↓</div>
+      </div></div>
+      <div class="v-foot">баланс между «коротко» и «понятно что я могу»</div>
+    </div>
+
+    <!-- 1c — after upload state, parsing + CTAs -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>После аплоада: парсинг → 3 пути<small>основной флоу</small></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">
+        <span class="chip"><span class="ext">XLSX</span>travel_q1_2026.xlsx</span>
+      </div></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="status"><span class="spin"></span>Парсю файл (28 MB)...</div>
+        <div class="status done"><span class="spin"></span>Структура: 31 240 строк, 104 колонки</div>
+        <div class="status done"><span class="spin"></span>Распознал: дата, маршрут, провайдер, стоимость</div>
+        <div class="h" style="margin-top:6px">Файл готов. Что дальше?</div>
+        <table class="md sm"><tr><th style="width:30px">#</th><th>Режим</th><th style="width:64px">Время</th></tr>
+          <tr><td>1</td><td>Свободный чат с данными</td><td>—</td></tr>
+          <tr><td>2</td><td>Собрать Business Review</td><td>30s–5m</td></tr>
+          <tr><td>3</td><td>Показать 3 ключевые цифры</td><td>10s</td></tr></table>
+        <div class="muted">напишите номер или опишите свой запрос</div>
+      </div></div>
+      <div class="v-foot">статусы — __event_emitter__ type:status, done:true когда шаг завершён</div>
+    </div>
+
+    <!-- 1d — guided onboarding with example questions -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>Файл уже есть в Knowledge<small>повторный заход в чат</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">С возвращением. У вас 2 файла в этом чате:</div>
+        <table class="md sm"><tr><td>·</td><td><span class="chip"><span class="ext">XLSX</span>travel_q1_2026.xlsx</span></td><td class="muted">31k строк · загружен 2д назад</td></tr>
+          <tr><td>·</td><td><span class="chip"><span class="ext">XLSX</span>hotels_q1.xlsx</span></td><td class="muted">4k строк · вчера</td></tr></table>
+        <div style="margin-top:4px">Продолжаем с тем же контекстом, или прикрепите новый файл.</div>
+        <div class="actions">
+          <button class="btn primary">→ Продолжить</button>
+          <button class="btn">+ Заменить файл</button>
+          <button class="btn">+ Добавить второй</button>
+        </div>
+      </div></div>
+      <div class="v-foot">кейс «вернулся в чат» — без повторного приветствия</div>
+    </div>
+
+  </div>
+  <div class="note-row"><div class="arrow">★</div><div class="note">recommend: 1b как greeting + 1c как post-upload. 1a слишком пусто, 1d — отдельный edge case.</div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 02 · СВОБОДНЫЙ ЧАТ                                           -->
+<!-- ============================================================ -->
+<section class="scene" id="s02">
+  <div class="scene-tag"><span class="num">02</span> · Talk2Data — свободный чат</div>
+  <div class="scene-sub">вопрос текстом → Markdown-таблица + интерактивный Plotly-график. Дальше — follow-up действия как inline-кнопки.</div>
+
+  <div class="msg user"><div class="av">A</div><div class="bubble">Топ-10 направлений по расходам, и динамика по месяцам</div></div>
+
+  <div class="msg bot"><div class="av">T2D</div><div class="bubble" style="max-width:96%">
+    <div class="status done"><span class="spin"></span>SQL → 31 240 строк агрегировано за 1.2s</div>
+    <div class="status done"><span class="spin"></span>Plotly chart готов: charts/8a3f.html</div>
+    <div class="h">Топ-10 направлений · расходы Q1 2026</div>
+    <table class="md sm">
+      <tr><th style="width:24px">#</th><th>Направление</th><th>Расход, ₽</th><th style="width:52px">Тр-ций</th><th style="width:54px">Δ vs Q4</th></tr>
+      <tr><td>1</td><td>Москва → СПб</td><td>14 820 410</td><td>1 204</td><td style="color:var(--green)">+12%</td></tr>
+      <tr><td>2</td><td>Москва → Екб</td><td>9 110 220</td><td>742</td><td style="color:var(--green)">+4%</td></tr>
+      <tr><td>3</td><td>Москва → Казань</td><td>7 845 660</td><td>618</td><td style="color:var(--red)">−2%</td></tr>
+      <tr><td>4</td><td>СПб → Москва</td><td>7 220 100</td><td>1 098</td><td style="color:var(--green)">+9%</td></tr>
+      <tr><td>5</td><td>Москва → Сочи</td><td>6 540 880</td><td>402</td><td style="color:var(--green)">+18%</td></tr>
+      <tr><td>6</td><td>Москва → Минвод.</td><td>5 102 740</td><td>318</td><td style="color:var(--green)">+22%</td></tr>
+      <tr><td colspan="5" class="muted">… ещё 4 строки</td></tr>
+    </table>
+  </div></div>
+
+  <div class="msg bot"><div class="av"></div><div class="bubble wide">
+    <div class="iframe-ph">
+      <span class="lbl">Plotly · interactive chart (HTMLResponse iframe)</span>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:140px;margin-top:8px;padding:0 6px">
+        <!-- schematic line/bar chart -->
+        <div style="flex:1;height:38%;background:var(--ink-3)"></div>
+        <div style="flex:1;height:52%;background:var(--ink-3)"></div>
+        <div style="flex:1;height:48%;background:var(--ink-3)"></div>
+        <div style="flex:1;height:64%;background:var(--ink-3)"></div>
+        <div style="flex:1;height:72%;background:var(--ink-3)"></div>
+        <div style="flex:1;height:60%;background:var(--ink-3)"></div>
+        <div style="flex:1;height:84%;background:var(--ink)"></div>
+        <div style="flex:1;height:78%;background:var(--ink)"></div>
+        <div style="flex:1;height:92%;background:var(--ink)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px" class="muted">янв · фев · мар · апр · май · июн · июл · авг · сен</div>
+      <div style="margin-top:8px;font-size:11px" class="muted">/charts/8a3f.html · hover, zoom, download PNG · 320 KB</div>
+    </div>
+  </div></div>
+
+  <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+    Хотите углубить? Подсказываю смежные разрезы:
+    <div class="actions">
+      <button class="btn">Авиа vs ж/д</button>
+      <button class="btn">По клиентам</button>
+      <button class="btn">Аномалии в топ-10</button>
+      <button class="btn">Выгрузить в CSV</button>
+      <button class="btn marker">→ Собрать BR из этих данных</button>
+    </div>
+  </div></div>
+
+  <div class="note-row"><div class="arrow">↑</div><div class="note">Plotly = HTMLResponse(content_disposition:"inline") → frontend рендерит как Rich UI embed iframe. Iframe Same-Origin = ON чтобы работали zoom и tooltip.</div></div>
+  <div class="note-row"><div class="arrow">★</div><div class="note">Жёлтая кнопка-«мостик» в BR-флоу — выводит из свободного чата без потери контекста.</div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 03 · ВЫБОР СЦЕНАРИЯ BR (4 варианта)                          -->
+<!-- ============================================================ -->
+<section class="scene" id="s03">
+  <div class="scene-tag"><span class="num">03</span> · Выбор сценария BR</div>
+  <div class="scene-sub">после загрузки файла или после фразы «собери BR» — модель предлагает 3 режима: шаблон / интервью / каталог. Как лучше подать?</div>
+
+  <div class="variants">
+
+    <!-- 3a numbered list -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>Numbered list<small>pure Markdown · ноль зависимостей</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Готов собрать Business Review. Как удобнее?</div>
+        <div><b>1.  Шаблон</b> — выбираем из готовых: Exec Summary / Operational / Client. Я сам решу что показать.</div>
+        <div style="margin-top:6px"><b>2.  Интервью</b> — задам 4–5 уточняющих вопросов и соберу под вас.</div>
+        <div style="margin-top:6px"><b>3.  Каталог вопросов</b> — покажу 32 готовых аналитических вопроса, отметите интересные.</div>
+        <div class="muted" style="margin-top:6px">Напишите номер или название.</div>
+      </div></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">2</div></div>
+      <div class="v-foot">всегда работает. но юзер должен набирать.</div>
+    </div>
+
+    <!-- 3b table comparison -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Сравнительная таблица<small>видны trade-offs</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Three ways to build a BR:</div>
+        <table class="md sm">
+          <tr><th style="width:18px"></th><th>Режим</th><th>Когда подходит</th><th style="width:54px">Время</th></tr>
+          <tr><td>1</td><td><b>Шаблон</b></td><td>нужен «как обычно», стандарт</td><td>~30s</td></tr>
+          <tr><td>2</td><td><b>Интервью</b></td><td>BR под конкретную аудиторию</td><td>~2m</td></tr>
+          <tr><td>3</td><td><b>Каталог</b></td><td>хотите контролировать каждый блок</td><td>~5m</td></tr>
+        </table>
+        <div class="muted">введите 1 / 2 / 3 — или <span class="kbd">/br template</span> · <span class="kbd">/br interview</span> · <span class="kbd">/br catalog</span></div>
+      </div></div>
+      <div class="v-foot">power-user friendly: slash-команды + цифры</div>
+    </div>
+
+    <!-- 3c ASCII art card -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>Code-block art card<small>визуально как «карточка»</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+<pre class="code">╔═══════════════════════════════════════════╗
+║  BUSINESS REVIEW · режим сборки           ║
+╠═══════════════════════════════════════════╣
+║                                           ║
+║  [1] ШАБЛОН              ~30s            ║
+║      Exec · Operational · Client          ║
+║      ───────────────────────────          ║
+║                                           ║
+║  [2] ИНТЕРВЬЮ            ~2min           ║
+║      4–5 уточняющих вопросов              ║
+║      ───────────────────────────          ║
+║                                           ║
+║  [3] КАТАЛОГ             ~5min           ║
+║      32 готовых вопроса, мульти-выбор    ║
+║                                           ║
+╚═══════════════════════════════════════════╝
+                            напишите 1 / 2 / 3</pre>
+      </div></div>
+      <div class="v-foot">читается как меню. но широкий код может ломаться на мобильном.</div>
+    </div>
+
+    <!-- 3d inline buttons -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>Inline кнопки<small>__event_call__ confirmation</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Готов к Business Review. Выберите режим:</div>
+        <div class="actions" style="margin-top:10px">
+          <button class="btn primary">▦  Шаблон</button>
+          <button class="btn primary">?  Интервью</button>
+          <button class="btn primary">☑  Каталог</button>
+        </div>
+        <div class="muted" style="margin-top:6px;font-family:Inter">или ответьте текстом — что нужно</div>
+      </div></div>
+      <pre class="code" style="margin-top:6px">await __event_call__({
+  "type": "confirmation",
+  "data": {
+    "title": "Business Review",
+    "options": ["Шаблон","Интервью","Каталог"]
+  }
+}) // → {"value": "Шаблон"}</pre>
+      <div class="v-foot">самый быстрый клик. но требует Action / event_call поддержки.</div>
+    </div>
+
+  </div>
+  <div class="note-row"><div class="arrow">★</div><div class="note">prod-rec: <b>b</b> + <b>d</b> вместе — таблица как «что выбрать», кнопки внизу для тех кто ткнёт. Fallback на <b>a</b> если рендер упадёт.</div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 04 · ШАБЛОННЫЙ BR (2.1)                                      -->
+<!-- ============================================================ -->
+<section class="scene" id="s04">
+  <div class="scene-tag"><span class="num">04</span> · Шаблонный BR (2.1)</div>
+  <div class="scene-sub">три готовых шаблона. Как показать что внутри каждого, чтобы выбор был осознанным?</div>
+
+  <div class="variants">
+
+    <!-- 4a numbered cards -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>Numbered cards с описанием<small>plain MD</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Шаблоны Business Review</div>
+        <div style="margin-top:4px"><b>1.  Executive Summary</b> · 5–7 слайдов · ~30s<br><span class="muted">итоги Q · ключевые цифры · отклонения · 3 рекомендации</span></div>
+        <div style="margin-top:6px"><b>2.  Operational Review</b> · 12–15 слайдов · ~1m<br><span class="muted">разбор по категориям, провайдерам, маршрутам, аномалии</span></div>
+        <div style="margin-top:6px"><b>3.  Client Presentation</b> · 8–10 слайдов · ~1m<br><span class="muted">для встречи с клиентом, упор на value и saving</span></div>
+        <div class="muted" style="margin-top:6px">выберите номер</div>
+      </div></div>
+      <div class="v-foot">читается за 5 секунд. рекомендую как baseline.</div>
+    </div>
+
+    <!-- 4b comparison table -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Сравнение табличкой<small>parameters side-by-side</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <table class="md sm">
+          <tr><th></th><th>Exec</th><th>Operational</th><th>Client</th></tr>
+          <tr><td class="muted">Слайдов</td><td>5–7</td><td>12–15</td><td>8–10</td></tr>
+          <tr><td class="muted">Аудитория</td><td>C-level</td><td>тревел-мнгр</td><td>клиент</td></tr>
+          <tr><td class="muted">Глубина</td><td>high-level</td><td>детально</td><td>нарратив</td></tr>
+          <tr><td class="muted">Графиков</td><td>3</td><td>8–10</td><td>5</td></tr>
+          <tr><td class="muted">Saving-блок</td><td>—</td><td>—</td><td>✓</td></tr>
+        </table>
+        <div class="actions">
+          <button class="btn primary">Exec</button>
+          <button class="btn primary">Operational</button>
+          <button class="btn primary">Client</button>
+        </div>
+      </div></div>
+      <div class="v-foot">отлично для сравнения. но скучнее карточек.</div>
+    </div>
+
+    <!-- 4c ASCII slide previews -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>ASCII-превью первых слайдов<small>видно «о чём» каждый</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+<pre class="code">─── 1 · EXEC SUMMARY (5 слайдов) ───────
+┌─────────┐ ┌─────────┐ ┌─────────┐
+│ Q1 2026 │ │ Δ vs Q4 │ │  trend  │
+│ headln  │ │ +12%  ▲ │ │ ▁▂▅▇   │
+└─────────┘ └─────────┘ └─────────┘
+
+─── 2 · OPERATIONAL (13 слайдов) ───────
+┌─────────┐ ┌─────────┐ ┌─────────┐
+│ by cat  │ │ provider│ │anomalies│
+│▓▓▓░░ 60%│ │▓▓░░ 30% │ │  ⚠ 4   │
+└─────────┘ └─────────┘ └─────────┘
+
+─── 3 · CLIENT (9 слайдов) ─────────────
+┌─────────┐ ┌─────────┐ ┌─────────┐
+│ saving  │ │  recom  │ │ next ▶  │
+│  8M ₽   │ │  3 шт   │ │ steps   │
+└─────────┘ └─────────┘ └─────────┘</pre>
+        <div class="muted" style="margin-top:4px">напишите 1 / 2 / 3</div>
+      </div></div>
+      <div class="v-foot">самый «вкусный» в чате. фирменная фишка.</div>
+    </div>
+
+    <!-- 4d Rich UI gallery -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>Rich UI gallery<small>iframe с превью</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble wide">
+        <div class="iframe-ph" style="padding:10px">
+          <span class="lbl">Rich UI iframe — 3 карточки шаблонов</span>
+          <div class="grid3" style="margin-top:6px">
+            <div class="slide-ph"><div class="t">Exec</div><div>5 слайдов</div><div class="bars"><span style="height:50%"></span><span style="height:80%"></span><span style="height:60%"></span></div></div>
+            <div class="slide-ph"><div class="t">Operational</div><div>13 слайдов</div><div class="bars"><span style="height:30%"></span><span style="height:90%"></span><span style="height:50%"></span><span style="height:70%"></span></div></div>
+            <div class="slide-ph"><div class="t">Client</div><div>9 слайдов</div><div class="bars"><span style="height:70%"></span><span style="height:55%"></span><span style="height:85%"></span></div></div>
+          </div>
+          <div class="muted" style="font-size:10.5px;margin-top:6px">click → window.parent.postMessage({choice:"exec"})</div>
+        </div>
+      </div></div>
+      <div class="v-foot">круто. но требует Iframe Same-Origin = ON.</div>
+    </div>
+
+  </div>
+
+  <div class="scene-q" style="margin-top:18px">после выбора шаблона — что показывает чат?</div>
+
+  <div class="msg user"><div class="av">A</div><div class="bubble">2</div></div>
+  <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+    <div class="status done"><span class="spin"></span>Проверяю полноту данных</div>
+    <div class="status done"><span class="spin"></span>Считаю агрегаты по 7 разрезам</div>
+    <div class="status done"><span class="spin"></span>Строю 8 графиков Plotly</div>
+    <div class="status done"><span class="spin"></span>Собираю Marp-презентацию (13 слайдов)</div>
+    <div class="h" style="margin-top:6px">✓ Operational Review · готов</div>
+    <div class="muted">13 слайдов · 8 графиков · 2 таблицы · 47 секунд</div>
+    <div class="actions">
+      <button class="btn primary">▶  Открыть презентацию</button>
+      <button class="btn">PDF</button>
+      <button class="btn">PPTX</button>
+      <button class="btn">Markdown</button>
+      <button class="btn marker">Доработать</button>
+    </div>
+  </div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 05 · ИНТЕРВЬЮ BR (2.2)                                       -->
+<!-- ============================================================ -->
+<section class="scene" id="s05">
+  <div class="scene-tag"><span class="num">05</span> · Интервью BR (2.2)</div>
+  <div class="scene-sub">LLM задаёт уточняющие вопросы. Главный диз-вопрос — по одному или сразу формой? И как держать темп, чтобы пользователь не устал?</div>
+
+  <div class="variants">
+
+    <!-- 5a one at a time -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>По одному вопросу<small>самый чат-нативный</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="muted" style="font-family:Inter;font-size:11px">шаг 1 / 4</div>
+        <div class="h">Для кого готовим BR?</div>
+        <div class="actions" style="margin-top:4px">
+          <button class="btn">C-level</button>
+          <button class="btn">тревел-менеджер</button>
+          <button class="btn">клиент</button>
+          <button class="btn">— другое</button>
+        </div>
+      </div></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">тревел-менеджер</div></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="muted" style="font-family:Inter;font-size:11px">шаг 2 / 4</div>
+        <div class="h">Период?</div>
+        <div class="actions">
+          <button class="btn">весь файл (Q1)</button>
+          <button class="btn">последний месяц</button>
+          <button class="btn">Q1 vs Q4</button>
+          <button class="btn">свой</button>
+        </div>
+      </div></div>
+      <div class="v-foot">прогресс «1/4» снимает ощущение бесконечности</div>
+    </div>
+
+    <!-- 5b form all at once -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Форма со всеми сразу<small>__event_call__ type:input</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Уточните 4 параметра:</div>
+        <div class="muted" style="margin-bottom:4px">отметьте по одному в каждой группе</div>
+        <div style="font-size:12px"><b>1. Аудитория</b></div>
+        <div class="cb"><span class="cb-box"></span>C-level</div>
+        <div class="cb checked"><span class="cb-box">✓</span>тревел-менеджер</div>
+        <div class="cb"><span class="cb-box"></span>клиент</div>
+        <div style="font-size:12px;margin-top:4px"><b>2. Период</b></div>
+        <div class="cb"><span class="cb-box"></span>весь файл</div>
+        <div class="cb checked"><span class="cb-box">✓</span>Q1 vs Q4</div>
+        <div class="cb"><span class="cb-box"></span>30 дней</div>
+        <div style="font-size:12px;margin-top:4px"><b>3. Фокус</b></div>
+        <div class="cb checked"><span class="cb-box">✓</span>расходы / бюджет</div>
+        <div class="cb"><span class="cb-box"></span>SLA провайдеров</div>
+        <div class="cb"><span class="cb-box"></span>аномалии</div>
+        <div class="actions"><button class="btn primary">Собрать BR</button></div>
+      </div></div>
+      <div class="v-foot">плотно. для опытных. модальное окно через event_call.</div>
+    </div>
+
+    <!-- 5c adaptive interview -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>Адаптивное · ветвится по ответу<small>LLM сама решает</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble"><b>Для кого?</b></div></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">для C-level, у нас квартальный совет</div></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <span class="muted">понял — короткий, только цифры, без операционных деталей. ещё один вопрос:</span>
+        <div class="h" style="margin-top:4px">Что главное в этом квартале?</div>
+        <div class="actions">
+          <button class="btn">переезд людей в Сочи</button>
+          <button class="btn">новый провайдер</button>
+          <button class="btn">сокращение бюджета</button>
+          <button class="btn">просто стандарт</button>
+        </div>
+      </div></div>
+      <div class="v-foot">★ меньше вопросов = меньше friction. но требует хорошего системного промпта.</div>
+    </div>
+
+    <!-- 5d slash-style power user -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>Slash-команда одной строкой<small>для power user</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        Можно ответить одной строкой:
+<pre class="code">/br interview \
+  --audience=travel-mgr \
+  --period=q1-vs-q4 \
+  --focus=spend,anomaly \
+  --slides=10</pre>
+        <div class="muted">или просто «соберём для тревел-менеджера, q1 vs q4, фокус расходы, 10 слайдов» — я разберусь.</div>
+      </div></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble" style="font-family:'JetBrains Mono';font-size:12.5px">/br interview --audience=travel-mgr --period=q1-vs-q4 --focus=spend,anomaly</div></div>
+      <div class="v-foot">для тех кто хочет ввести и забыть. parsing на стороне tool.</div>
+    </div>
+
+  </div>
+  <div class="note-row"><div class="arrow">★</div><div class="note">recommend: <b>c</b> как default, <b>d</b> доступна всегда. Юзер ленится — модель тоже не должна спрашивать лишнее.</div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 06 · КАТАЛОГ ВОПРОСОВ (2.3)                                  -->
+<!-- ============================================================ -->
+<section class="scene" id="s06">
+  <div class="scene-tag"><span class="num">06</span> · Каталог вопросов (2.3)</div>
+  <div class="scene-sub">32 готовых аналитических вопроса, сгруппированы по темам. Главный челлендж — мульти-выбор в текстовом чате.</div>
+
+  <div class="variants">
+
+    <!-- 6a checkbox tree markdown -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>Markdown checkbox tree<small>«- [ ]» синтаксис</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Каталог вопросов · 32 шт.</div>
+        <div class="muted" style="margin-bottom:6px">скопируйте в ответ, проставьте [x] напротив нужных, отправьте</div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;line-height:1.5">
+          <b>── РАСХОДЫ ──────────</b>
+          <div class="cb checked"><span class="cb-box">✓</span>Динамика по месяцам</div>
+          <div class="cb checked"><span class="cb-box">✓</span>Топ-10 направлений</div>
+          <div class="cb"><span class="cb-box"></span>Доля категорий (авиа/жд/...)</div>
+          <div class="cb"><span class="cb-box"></span>Аномальные транзакции</div>
+          <b>── ПРОВАЙДЕРЫ ───────</b>
+          <div class="cb"><span class="cb-box"></span>Доля по провайдерам</div>
+          <div class="cb checked"><span class="cb-box">✓</span>SLA / задержки</div>
+          <div class="cb"><span class="cb-box"></span>Сравнение цен</div>
+          <b>── ЛЮДИ ─────────────</b>
+          <div class="cb"><span class="cb-box"></span>Top-15 командировочных</div>
+          <div class="cb"><span class="cb-box"></span>Распределение по ЦФО</div>
+          <div class="cb checked"><span class="cb-box">✓</span>Возвраты и отмены</div>
+        </div>
+        <div class="muted" style="margin-top:4px">+ ещё 22 в полной версии</div>
+      </div></div>
+      <div class="v-foot">honestly — никто не будет копировать. fallback only.</div>
+    </div>
+
+    <!-- 6b numbered with ranges -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Нумерация + диапазоны<small>«1, 3, 7-9, 12»</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">Каталог · напишите номера через запятую</div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;line-height:1.55">
+          <b>Расходы</b><br>
+          &nbsp;1.  Динамика по месяцам<br>
+          &nbsp;2.  Топ-10 направлений<br>
+          &nbsp;3.  Доля категорий<br>
+          &nbsp;4.  Аномалии<br>
+          <b>Провайдеры</b><br>
+          &nbsp;5.  Доля<br>
+          &nbsp;6.  SLA / задержки<br>
+          &nbsp;7.  Сравнение цен<br>
+          <b>Люди</b><br>
+          &nbsp;8.  Top-15 командировочных<br>
+          &nbsp;9.  По ЦФО<br>
+          10.  Возвраты<br>
+          <span class="muted">… ещё 22</span>
+        </div>
+        <div class="muted" style="margin-top:6px">пример: <span class="kbd">1, 2, 6, 8-10</span> · <span class="kbd">all from spend + 6</span> · <span class="kbd">все кроме людей</span></div>
+      </div></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">1, 2, 6, 8-10</div></div>
+      <div class="v-foot">★ работает в чистом тексте, поддерживает natural language</div>
+    </div>
+
+    <!-- 6c step-by-step categories -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>По одной категории за раз<small>__event_call__ type:input multi</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="muted" style="font-family:Inter;font-size:11px">категория 1 / 3</div>
+        <div class="h">Расходы</div>
+        <div class="cb checked"><span class="cb-box">✓</span>Динамика по месяцам</div>
+        <div class="cb checked"><span class="cb-box">✓</span>Топ-10 направлений</div>
+        <div class="cb"><span class="cb-box"></span>Доля категорий</div>
+        <div class="cb"><span class="cb-box"></span>Аномалии</div>
+        <div class="actions">
+          <button class="btn primary">Дальше →</button>
+          <button class="btn">Пропустить</button>
+          <button class="btn">Взять все</button>
+        </div>
+      </div></div>
+      <div class="v-foot">меньше скроллинга, больше шагов. чек-инс через event_call.</div>
+    </div>
+
+    <!-- 6d Rich UI tree -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>Rich UI · интерактивное дерево<small>iframe + postMessage</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble wide">
+        <div class="iframe-ph" style="padding:12px;text-align:left">
+          <span class="lbl">Rich UI · question tree</span>
+          <div style="font-family:'JetBrains Mono';font-size:11.5px;color:var(--ink-2);margin-top:6px;line-height:1.6">
+            ▼ Расходы &nbsp;<span class="muted">[3/4 selected]</span><br>
+            &nbsp;&nbsp;&nbsp;☑ Динамика по месяцам<br>
+            &nbsp;&nbsp;&nbsp;☑ Топ-10 направлений<br>
+            &nbsp;&nbsp;&nbsp;☐ Категории<br>
+            &nbsp;&nbsp;&nbsp;☑ Аномалии<br>
+            ▶ Провайдеры &nbsp;<span class="muted">[1/3]</span><br>
+            ▶ Люди &nbsp;<span class="muted">[0/3]</span><br>
+            <br>
+            <button class="btn primary" style="font-size:11px">Apply 4 selected</button> &nbsp;<span class="muted">→ window.parent.postMessage</span>
+          </div>
+        </div>
+      </div></div>
+      <div class="v-foot">★ best UX. но дороже всего и нужен Same-Origin.</div>
+    </div>
+
+  </div>
+  <div class="note-row"><div class="arrow">★</div><div class="note">prod-rec: <b>b</b> как baseline (всегда работает) + <b>d</b> когда Rich UI доступен. <b>c</b> хороша для slow онбординга новых юзеров.</div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 07 · ССЫЛКА НА ПРЕЗЕНТАЦИЮ                                   -->
+<!-- ============================================================ -->
+<section class="scene" id="s07">
+  <div class="scene-tag"><span class="num">07</span> · Финальная ссылка на презентацию</div>
+  <div class="scene-sub">Marp HTML собран. Как отдать его в чат, чтобы было «вау» и удобно? 4 уровня насыщенности.</div>
+
+  <div class="variants">
+
+    <!-- 7a card with first-slide preview -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>Карточка с превью первого слайда<small>Rich UI iframe ★</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble wide">
+        <div class="iframe-ph" style="padding:0;overflow:hidden">
+          <div class="slide-ph" style="aspect-ratio:16/9;border:none;border-radius:0;background:var(--paper-2);padding:20px;align-items:flex-start">
+            <div style="text-align:left;width:100%">
+              <div class="muted" style="font-size:9px;letter-spacing:.2em">QUARTERLY · Q1 2026</div>
+              <div class="t" style="font-size:24px;line-height:1.05;margin-top:8px;color:var(--ink)">Operational<br>Travel Review</div>
+              <div style="font-size:9.5px;color:var(--ink-3);margin-top:auto;position:absolute;bottom:12px;left:20px">Talk2Data · auto-generated</div>
+            </div>
+            <div style="position:absolute;right:14px;bottom:14px;display:flex;gap:2px;align-items:flex-end;height:36px">
+              <span style="width:5px;background:var(--ink-3);height:60%"></span>
+              <span style="width:5px;background:var(--ink-3);height:80%"></span>
+              <span style="width:5px;background:var(--ink-3);height:50%"></span>
+              <span style="width:5px;background:var(--ink);height:90%"></span>
+            </div>
+          </div>
+          <div style="padding:10px 14px;font-family:Inter;font-size:11.5px;display:flex;justify-content:space-between;align-items:center;background:var(--paper)">
+            <div>
+              <div style="font-weight:600;color:var(--ink)">Q1 2026 · Operational Review</div>
+              <div class="muted" style="font-size:10.5px">13 слайдов · 8 графиков · собрано 47 сек назад</div>
+            </div>
+            <div class="actions" style="margin:0">
+              <button class="btn primary icon">Открыть</button>
+              <button class="btn icon">PDF</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="v-foot">самое выразительное. иконка-превью + метаданные.</div>
+    </div>
+
+    <!-- 7b embed iframe -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Embed · презентация играет в чате<small>fullsize iframe</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble wide">
+        <div class="iframe-ph" style="padding:0">
+          <div class="slide-ph" style="aspect-ratio:16/9;border:none;border-radius:0;background:var(--paper-2);position:relative">
+            <div class="t" style="font-size:18px">slide 1 / 13</div>
+            <div class="muted" style="margin-top:4px">Operational Review · Q1 2026</div>
+            <div style="position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:14px;font-size:14px;color:var(--ink-3)">◀&nbsp;&nbsp;&nbsp;▶&nbsp;&nbsp;&nbsp;⛶</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="v-foot">пролистывается прямо в чате. но забивает экран.</div>
+    </div>
+
+    <!-- 7c plain markdown link -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>Plain Markdown links<small>fallback · всегда работает</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">✓ Презентация готова</div>
+        <div class="muted">Operational Review · Q1 2026 · 13 слайдов</div>
+        <div style="margin-top:8px;line-height:2">
+          <a style="color:var(--blue);text-decoration:underline">→  Открыть презентацию (HTML)</a><br>
+          <a style="color:var(--blue);text-decoration:underline">⤓  Скачать PDF</a><br>
+          <a style="color:var(--blue);text-decoration:underline">⤓  Скачать PPTX</a><br>
+          <a style="color:var(--blue);text-decoration:underline">⤓  Markdown source</a>
+        </div>
+      </div></div>
+      <div class="v-foot">всегда. везде. ноль зависимостей. но скучно.</div>
+    </div>
+
+    <!-- 7d TOC + slide list -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>TOC + список слайдов<small>видно содержание</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="h">✓ Operational Review · Q1 2026</div>
+        <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--ink-2);line-height:1.7;margin-top:4px">
+          &nbsp;1.  <a style="color:var(--blue)">Headline · Q1 итоги</a><br>
+          &nbsp;2.  <a style="color:var(--blue)">Расходы по категориям</a><br>
+          &nbsp;3.  <a style="color:var(--blue)">Топ-10 направлений</a><br>
+          &nbsp;4.  <a style="color:var(--blue)">Динамика по месяцам</a><br>
+          &nbsp;5.  <a style="color:var(--blue)">SLA провайдеров</a><br>
+          &nbsp;6.  <a style="color:var(--blue)">Сравнение цен авиа</a><br>
+          <span class="muted">  …7 ещё</span><br>
+          13.  <a style="color:var(--blue)">Рекомендации</a>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn primary">▶  Всю презентацию</button>
+          <button class="btn">PDF</button>
+          <button class="btn">PPTX</button>
+          <button class="btn marker">Доработать слайд</button>
+        </div>
+      </div></div>
+      <div class="v-foot">★ можно открыть любой слайд · удобно для итераций</div>
+    </div>
+
+  </div>
+  <div class="note-row"><div class="arrow">★</div><div class="note">prod-rec: <b>a</b> когда Rich UI доступен (95% случаев), <b>c</b> как auto-fallback. <b>d</b> для «итеративного» сценария когда юзер хочет править отдельные слайды.</div></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 08 · EDGE CASES                                              -->
+<!-- ============================================================ -->
+<section class="scene" id="s08">
+  <div class="scene-tag"><span class="num">08</span> · Ошибки и edge cases</div>
+  <div class="scene-sub">битый Excel · нераспознаны колонки · слишком большой файл · неоднозначный вопрос. Главное — не блокировать, а предложить путь дальше.</div>
+
+  <div class="variants">
+
+    <!-- 8a corrupt -->
+    <div class="v">
+      <div class="v-label"><span class="num">a</span>Битый Excel<small>не парсится / ZIP внутри</small></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble"><span class="chip"><span class="ext bad">ZIP</span>travel.xlsx.zip</span></div></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="status done"><span class="spin"></span>Попытка открыть...</div>
+        <div class="callout"><b>⚠  Не получилось открыть.</b><br>Это не Excel — расширение .xlsx, но внутри ZIP-архив (вероятно автоматически упаковали при выгрузке).</div>
+        <div class="h" style="margin-top:6px">Что попробовать</div>
+        · распаковать архив и приложить <span class="kbd">.xlsx</span> внутри<br>
+        · если из 1С — пересохранить «Книга Excel (.xlsx)»<br>
+        · если &gt;500 MB — выгрузите в CSV
+        <div class="actions">
+          <button class="btn primary">Попробовать ещё раз</button>
+          <button class="btn">Гайд по выгрузке</button>
+        </div>
+      </div></div>
+      <div class="v-foot">конкретные причины + действия. без «something went wrong».</div>
+    </div>
+
+    <!-- 8b empty data / unknown columns -->
+    <div class="v">
+      <div class="v-label"><span class="num">b</span>Не распознал колонки<small>файл ок, но схема чужая</small></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="callout warn"><b>Файл прочитал, но не нашёл стандартных колонок.</b><br>Ожидал: «дата», «сумма», «направление», «категория». Нашёл другие имена.</div>
+        <div class="h" style="margin-top:6px">У вас в файле:</div>
+        <table class="md sm">
+          <tr><th>Колонка</th><th>Тип</th><th>Пример</th></tr>
+          <tr><td>Объект</td><td>text</td><td>AVIA-22847</td></tr>
+          <tr><td>Создано</td><td>date</td><td>2026-01-12</td></tr>
+          <tr><td>Стоимость</td><td>num</td><td>24 800</td></tr>
+        </table>
+        <div style="margin-top:6px">Если это нужные данные — подскажите соответствие.</div>
+        <div class="actions">
+          <button class="btn primary">Сопоставить колонки</button>
+          <button class="btn">Другой файл</button>
+        </div>
+      </div></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">Стоимость = сумма, Создано = дата</div></div>
+      <div class="v-foot">★ самое важное: не блокировать — предложить mapping.</div>
+    </div>
+
+    <!-- 8c large file -->
+    <div class="v">
+      <div class="v-label"><span class="num">c</span>Слишком большой файл<small>streaming · превью + фон</small></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble"><span class="chip"><span class="ext">XLSX</span>mega_travel_2025.xlsx</span> &nbsp;<span class="muted">210 MB · 1.4M строк</span></div></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        <div class="status"><span class="spin"></span>Загружаю (164 / 210 MB)...</div>
+        <div class="status"><span class="spin"></span>Парсю первую часть...</div>
+        <div class="callout warn">Файл крупный. Я обработал первые <b>100 000 строк</b> чтобы вы могли начать работать. Полный пересчёт идёт в фоне (~3 мин).</div>
+        <div class="muted">пока доступно: топ-15 направлений, динамика по дням, разрез по провайдерам</div>
+        <div class="actions">
+          <button class="btn primary">Работать с превью</button>
+          <button class="btn">Подождать полную</button>
+        </div>
+      </div></div>
+      <div class="v-foot">не ждать молча. показать частичный результат сразу.</div>
+    </div>
+
+    <!-- 8d ambiguous question -->
+    <div class="v">
+      <div class="v-label"><span class="num">d</span>Неоднозначный вопрос<small>модель уточняет</small></div>
+      <div class="msg user"><div class="av">A</div><div class="bubble">а сколько мы по итогу заплатили вообще</div></div>
+      <div class="msg bot"><div class="av">T2D</div><div class="bubble">
+        У вас несколько колонок про деньги — какая «по итогу»?
+        <div class="cb checked"><span class="cb-box">✓</span>Сумма билета (без доплат)</div>
+        <div class="cb"><span class="cb-box"></span>Итоговая стоимость (с такс и сборами)</div>
+        <div class="cb"><span class="cb-box"></span>Списано с корпкарты</div>
+        <div class="actions">
+          <button class="btn primary">1</button>
+          <button class="btn primary">2</button>
+          <button class="btn primary">3</button>
+          <button class="btn">Все три, сравнить</button>
+        </div>
+        <div class="muted" style="margin-top:6px">по умолчанию беру [1] — сумма билета. напишите номер чтобы изменить.</div>
+      </div></div>
+      <div class="v-foot">«по умолчанию беру X» — даёт ответ, не блокируя.</div>
+    </div>
+
+  </div>
+
+  <div class="composer">
+    <div class="clip">📎</div>
+    <div class="input"><span class="muted">Спросите ещё или прикрепите файл...</span></div>
+    <div class="send">↑</div>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- CLOSING                                                      -->
+<!-- ============================================================ -->
+<div style="padding:30px 24px 80px;text-align:center;border-top:1px dashed var(--line);margin-top:30px;font-family:Caveat,cursive">
+  <div style="font-size:24px;color:var(--ink-2)">— конец черновика —</div>
+  <div style="font-family:Inter,sans-serif;font-size:12px;color:var(--ink-3);margin-top:8px;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.5">
+    дальше: выбрать варианты по каждой сцене (1 baseline + 1 enhanced когда Rich UI доступен) → собрать API-контракт для FastAPI tool: какие <span class="kbd">__event_emitter__</span> сообщения, какие HTMLResponse шаблоны, fallback-цепочки.
+  </div>
+</div>
+
+    </section>
+  </main>
+</div>
+
+<button id="tw-toggle" type="button">Tweaks ▸</button>
+
+<script>
+(function(){
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "theme": "dark"
+  }/*EDITMODE-END*/;
+  let state = {...TWEAK_DEFAULTS};
+  let panel = null, active = false;
+  function apply(){ document.body.dataset.theme = state.theme; }
+  apply();
+  function build(){
+    const p = document.createElement('div');
+    p.className = 'tw-panel';
+    p.innerHTML = `
+      <h6>Tweaks <button id="tw-x" style="background:none;border:none;color:var(--ink-3);font-size:18px;cursor:pointer;line-height:1;padding:0">×</button></h6>
+      <div class="tw-row">OWUI theme</div>
+      <div class="tw-seg" id="tw-theme">
+        <button data-v="light">Light</button>
+        <button data-v="dark">Dark</button>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--ink-3);line-height:1.4">
+        Переключает тему чата. Wireframe-листы остаются скетчевыми в обеих.
+      </div>`;
+    document.body.appendChild(p);
+    p.querySelector('#tw-x').onclick = deactivate;
+    p.querySelector('#tw-theme').addEventListener('click', e=>{
+      const b = e.target.closest('button[data-v]'); if(!b) return;
+      state.theme = b.dataset.v; apply(); refresh();
+      try{ window.parent.postMessage({type:'__edit_mode_set_keys',edits:{theme:state.theme}},'*'); }catch(e){}
+    });
+    refresh(p);
+    return p;
+  }
+  function refresh(p=panel){
+    if(!p) return;
+    p.querySelectorAll('#tw-theme button').forEach(b=>{
+      b.classList.toggle('on', b.dataset.v===state.theme);
+    });
+  }
+  function activate(){
+    if(active) return; active = true;
+    if(!panel) panel = build();
+    panel.style.display = 'block';
+    document.getElementById('tw-toggle').style.display = 'none';
+  }
+  function deactivate(){
+    active = false;
+    if(panel) panel.style.display = 'none';
+    document.getElementById('tw-toggle').style.display = '';
+    try{ window.parent.postMessage({type:'__edit_mode_dismissed'},'*'); }catch(e){}
+  }
+  window.addEventListener('message', e=>{
+    const t = e.data && e.data.type;
+    if(t==='__activate_edit_mode') activate();
+    else if(t==='__deactivate_edit_mode') deactivate();
+  });
+  try{ window.parent.postMessage({type:'__edit_mode_available'},'*'); }catch(e){}
+  document.getElementById('tw-toggle').addEventListener('click', activate);
+})();
+</script>
+</body>
+</html>
