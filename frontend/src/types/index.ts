@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 export type Phase =
+  | 'home'
   | 'upload'
   | 'entry'
   | 'free_chat'
@@ -21,6 +22,26 @@ export interface ChatMessage {
   from: 'user' | 'assistant'
   stamp: string
   content: ReactNode
+}
+
+export type SessionState = 'диалог' | 'готов' | 'черновик'
+
+export interface Session {
+  id: string
+  title: string
+  project_name: string | null
+  file_id: string | null
+  file_name: string | null
+  state: SessionState
+  pinned: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface Project {
+  name: string
+  color: string
+  session_ids: string[]
 }
 
 export type IconName =
@@ -50,3 +71,9 @@ export type IconName =
   | 'list'
   | 'chart'
   | 'plus'
+  | 'folder'
+  | 'folder-open'
+  | 'clock'
+  | 'message'
+  | 'pin'
+  | 'more'

@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef } from 'react'
-import type { Phase, FileInfo, ChatMessage } from './types/index.ts'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import type { Phase, FileInfo, ChatMessage, Session, Project } from './types/index.ts'
 import { ChatShell } from './components/ChatShell.tsx'
+import { Sidebar } from './components/Sidebar.tsx'
 import { FileChip } from './components/FileChip.tsx'
 import { ToolCallBadge } from './components/ToolCallBadge.tsx'
 import { DataTable } from './components/DataTable.tsx'
@@ -12,6 +13,7 @@ import { TemplateView } from './views/TemplateView.tsx'
 import { InterviewView } from './views/InterviewView.tsx'
 import { CatalogView } from './views/CatalogView.tsx'
 import { PresentationView } from './views/PresentationView.tsx'
+import { HomeView } from './views/HomeView.tsx'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -20,11 +22,9 @@ function now() {
 }
 
 let idCounter = 0
-function uid() {
-  return String(++idCounter)
-}
+function uid() { return String(++idCounter) }
 
-// ── Mock data for demo mode ───────────────────────────────
+// ── Mock data ─────────────────────────────────────────────
 const MOCK_TABLE_COLS = [
   { key: 'direction', label: 'Направление' },
   { key: 'trips', label: 'Поездок', numeric: true },
@@ -58,9 +58,7 @@ function mockChatResponse(question: string) {
       )}
       <div className="chips-row" style={{ marginTop: 10 }}>
         {['Показать по месяцам', 'Разбить по департаментам', 'Сравнить с прошлым кварталом'].map(s => (
-          <button key={s} className="chip" type="button" style={{ fontSize: 12 }}>
-            {s}
-          </button>
+          <button key={s} className="chip" type="button" style={{ fontSize: 12 }}>{s}</button>
         ))}
       </div>
     </div>
@@ -69,36 +67,90 @@ function mockChatResponse(question: string) {
 
 // ── App ───────────────────────────────────────────────────
 export default function App() {
-  const [phase, setPhase] = useState<Phase>('upload')
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: uid(),
-      from: 'assistant',
-      stamp: now(),
-      content: <UploadViewWrapper />,
-    },
-  ])
+  const [phase, setPhase] = useState<Phase>('home')
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null)
   const [selectedTemplate, setSelectedTemplate] = useState<string>('executive')
   const [loading, setLoading] = useState(false)
+
+  // Session state
+  const [sessions, setSessions] = useState<Session[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
+  const [activeSession, setActiveSession] = useState<Session | null>(null)
+
   const phaseRef = useRef(phase)
   phaseRef.current = phase
+
+  // Load sessions on startup
+  useEffect(() => {
+    void loadSessions()
+  }, [])
+
+  const loadSessions = async () => {
+    try {
+      const [sessRes, projRes] = await Promise.all([
+        fetch(`${API_BASE}/sessions`),
+        fetch(`${API_BASE}/projects`),
+      ])
+      if (sessRes.ok) setSessions(await sessRes.json() as Session[])
+      if (projRes.ok) setProjects(await projRes.json() as Project[])
+    } catch {
+      // Demo mode: no sessions yet
+    }
+  }
 
   const append = useCallback((msg: Omit<ChatMessage, 'id' | 'stamp'>) => {
     setMessages(prev => [...prev, { ...msg, id: uid(), stamp: now() }])
   }, [])
 
+  // ── Start new BR (go to upload) ──────────────────────────
+  const handleNewBR = useCallback(() => {
+    setActiveSession(null)
+    setFileInfo(null)
+    setMessages([{
+      id: uid(),
+      from: 'assistant',
+      stamp: now(),
+      content: <p style={{ color: 'var(--fg-3)' }}>Загрузите Excel-файл через кнопку скрепки в строке ввода или перетащите файл ниже.</p>,
+    }])
+    setPhase('upload')
+  }, [])
+
+  // ── Open existing session ────────────────────────────────
+  const handleSelectSession = useCallback((session: Session) => {
+    setActiveSession(session)
+    setFileInfo(session.file_id ? {
+      fileId: session.file_id,
+      fileName: session.file_name ?? '',
+      rowCount: 0,
+      columnCount: 0,
+    } : null)
+    setMessages([{
+      id: uid(),
+      from: 'assistant',
+      stamp: now(),
+      content: (
+        <div>
+          <p>Открыл сессию <strong>{session.title}</strong>{session.project_name ? ` из проекта ${session.project_name}` : ''}.</p>
+          {session.file_name && (
+            <p style={{ color: 'var(--fg-3)', marginTop: 4 }}>
+              Файл <strong>{session.file_name}</strong> уже загружен. Контекст диалога восстановлен.
+            </p>
+          )}
+        </div>
+      ),
+    }])
+    setPhase('free_chat')
+  }, [])
+
+  const handleSelectProject = useCallback((_projectName: string) => {
+    // TODO: show project view (HistoryC)
+  }, [])
+
   // ── File upload ──────────────────────────────────────────
   const handleUploadFile = useCallback(async (file: File) => {
     setLoading(true)
-
-    // Show user message with file chip
-    append({
-      from: 'user',
-      content: (
-        <FileChip fileName={file.name} />
-      ),
-    })
+    append({ from: 'user', content: <FileChip fileName={file.name} /> })
 
     let info: FileInfo
     try {
@@ -109,7 +161,6 @@ export default function App() {
       const data = await res.json() as { file_id: string; filename: string; row_count: number; column_count: number }
       info = { fileId: data.file_id, fileName: data.filename, rowCount: data.row_count, columnCount: data.column_count }
     } catch {
-      // Demo mode fallback
       info = { fileId: 'demo1234', fileName: file.name, rowCount: 34218, columnCount: 127 }
     }
 
@@ -130,7 +181,6 @@ export default function App() {
       ),
     })
 
-    // Delay entry cards slightly for natural feel
     setTimeout(() => {
       append({
         from: 'assistant',
@@ -139,34 +189,43 @@ export default function App() {
     }, 400)
   }, [append]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Create session on backend ────────────────────────────
+  const createSession = useCallback(async (title: string, fi: FileInfo | null): Promise<Session | null> => {
+    try {
+      const res = await fetch(`${API_BASE}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          file_id: fi?.fileId ?? null,
+          file_name: fi?.fileName ?? null,
+        }),
+      })
+      if (!res.ok) return null
+      const session = await res.json() as Session
+      setSessions(prev => [session, ...prev])
+      setActiveSession(session)
+      return session
+    } catch {
+      return null
+    }
+  }, [])
+
   // ── Scenario pick ────────────────────────────────────────
   const handleScenarioPick = useCallback((scenario: 'free_chat' | 'template' | 'preview') => {
     if (scenario === 'free_chat') {
       setPhase('free_chat')
-      append({
-        from: 'user',
-        content: <p>Спросить данные</p>,
-      })
-      append({
-        from: 'assistant',
-        content: <FreeChatViewWrapper onSuggestion={handleSuggestion} />,
-      })
+      void createSession('Свободный чат', fileInfo)
+      append({ from: 'user', content: <p>Спросить данные</p> })
+      append({ from: 'assistant', content: <FreeChatViewWrapper onSuggestion={handleSuggestion} /> })
     } else if (scenario === 'template') {
       setPhase('template')
-      append({
-        from: 'user',
-        content: <p>Собрать Business Review</p>,
-      })
-      append({
-        from: 'assistant',
-        content: <TemplateViewWrapper onPick={handleTemplatePick} />,
-      })
+      append({ from: 'user', content: <p>Собрать Business Review</p> })
+      append({ from: 'assistant', content: <TemplateViewWrapper onPick={handleTemplatePick} /> })
     } else {
       setPhase('free_chat')
-      append({
-        from: 'user',
-        content: <p>Просто посмотреть</p>,
-      })
+      void createSession('Быстрый обзор', fileInfo)
+      append({ from: 'user', content: <p>Просто посмотреть</p> })
       append({
         from: 'assistant',
         content: (
@@ -178,35 +237,46 @@ export default function App() {
         ),
       })
     }
-  }, [append]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [append, fileInfo, createSession]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Free chat ────────────────────────────────────────────
   const handleSendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return
     setLoading(true)
-
     append({ from: 'user', content: <p>{text}</p> })
 
     try {
-      const res = await fetch(`${API_BASE}/v1/chat/completions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          messages: [{ role: 'user', content: text }],
-        }),
-      })
-      if (!res.ok) throw new Error('API unavailable')
-      const data = await res.json() as { choices: { message: { content: string } }[] }
-      const reply = data.choices[0]?.message?.content ?? ''
-      append({ from: 'assistant', content: <p>{reply}</p> })
+      const sessionId = activeSession?.id
+      if (sessionId) {
+        const res = await fetch(`${API_BASE}/sessions/${sessionId}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: text }),
+        })
+        if (!res.ok) throw new Error('API unavailable')
+        const data = await res.json() as { content: string }
+        append({ from: 'assistant', content: <p>{data.content}</p> })
+      } else {
+        // Fallback: legacy endpoint
+        const res = await fetch(`${API_BASE}/v1/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'talk2data',
+            messages: [{ role: 'user', content: text }],
+            file_id: fileInfo?.fileId ?? null,
+          }),
+        })
+        if (!res.ok) throw new Error('API unavailable')
+        const data = await res.json() as { choices: { message: { content: string } }[] }
+        append({ from: 'assistant', content: <p>{data.choices[0]?.message?.content ?? ''}</p> })
+      }
     } catch {
-      // Demo mode
       append({ from: 'assistant', content: mockChatResponse(text) })
     }
 
     setLoading(false)
-  }, [append])
+  }, [append, activeSession, fileInfo])
 
   const handleSuggestion = useCallback((text: string) => {
     void handleSendMessage(text)
@@ -216,110 +286,104 @@ export default function App() {
   const handleTemplatePick = useCallback((template: string) => {
     setSelectedTemplate(template)
     setPhase('interview')
-    append({
-      from: 'user',
-      content: <p>{template === 'executive' ? 'Executive Summary' : template === 'operational' ? 'Operational Review' : 'Client Presentation'}</p>,
-    })
-    append({
-      from: 'assistant',
-      content: <InterviewViewWrapper onComplete={handleInterviewComplete} />,
-    })
-  }, [append]) // eslint-disable-line react-hooks/exhaustive-deps
+    const name = template === 'executive' ? 'Executive Summary' : template === 'operational' ? 'Operational Review' : 'Client Presentation'
+    void createSession(name, fileInfo)
+    append({ from: 'user', content: <p>{name}</p> })
+    append({ from: 'assistant', content: <InterviewViewWrapper onComplete={handleInterviewComplete} /> })
+  }, [append, fileInfo, createSession]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleInterviewComplete = useCallback((_answers: Record<string, string>) => {
     setPhase('catalog')
-    append({
-      from: 'assistant',
-      content: <CatalogViewWrapper onConfirm={handleCatalogConfirm} />,
-    })
+    append({ from: 'assistant', content: <CatalogViewWrapper onConfirm={handleCatalogConfirm} /> })
   }, [append]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCatalogConfirm = useCallback((_selected: string[]) => {
     setPhase('presentation')
-    append({
-      from: 'user',
-      content: <p>Генерирую презентацию...</p>,
-    })
-
-    // Simulate generation delay
+    append({ from: 'user', content: <p>Генерирую презентацию...</p> })
     setTimeout(() => {
       append({
         from: 'assistant',
         content: (
           <div>
-            <p style={{ color: 'var(--fg-2)', marginBottom: 12 }}>
-              Презентация готова:
-            </p>
+            <p style={{ color: 'var(--fg-2)', marginBottom: 12 }}>Презентация готова:</p>
             <PresentationViewWrapper fi={fileInfo} template={selectedTemplate} />
           </div>
         ),
       })
+      // Mark session as done
+      if (activeSession?.id) {
+        void fetch(`${API_BASE}/sessions/${activeSession.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ state: 'готов' }),
+        })
+        setActiveSession(prev => prev ? { ...prev, state: 'готов' } : null)
+        setSessions(prev => prev.map(s => s.id === activeSession.id ? { ...s, state: 'готов' } : s))
+      }
     }, 800)
-  }, [append, fileInfo, selectedTemplate])
+  }, [append, fileInfo, selectedTemplate, activeSession])
+
+  // ── Render ───────────────────────────────────────────────
+  const sessionFileMeta = activeSession?.file_name
+    ? `из ${activeSession.file_name}${messages.length > 1 ? ` · ${messages.length - 1} сообщ.` : ''}`
+    : null
 
   return (
-    <ChatShell
-      messages={messages}
-      fileInfo={fileInfo}
-      onUploadFile={handleUploadFile}
-      onSendMessage={handleSendMessage}
-      inputDisabled={loading || phase === 'upload'}
-      inputPlaceholder={
-        phase === 'upload'
-          ? 'Загрузите файл через кнопку скрепки или перетащите выше...'
-          : 'Напишите вопрос...'
-      }
-    />
+    <div className="app-layout">
+      <Sidebar
+        sessions={sessions}
+        projects={projects}
+        activeSessionId={activeSession?.id ?? null}
+        onNewBR={handleNewBR}
+        onSelectSession={handleSelectSession}
+        onSelectProject={handleSelectProject}
+      />
+
+      {phase === 'home' ? (
+        <HomeView
+          sessions={sessions}
+          projects={projects}
+          onNewBR={handleNewBR}
+          onSelectSession={handleSelectSession}
+          onSelectProject={handleSelectProject}
+        />
+      ) : (
+        <ChatShell
+          messages={messages}
+          fileInfo={fileInfo}
+          onUploadFile={handleUploadFile}
+          onSendMessage={handleSendMessage}
+          inputDisabled={loading || phase === 'upload'}
+          inputPlaceholder={
+            phase === 'upload'
+              ? 'Загрузите файл через кнопку скрепки или перетащите выше...'
+              : 'Напишите вопрос...'
+          }
+          loading={loading}
+          sessionTitle={activeSession?.title}
+          sessionProject={activeSession?.project_name ?? null}
+          sessionFileMeta={sessionFileMeta}
+        />
+      )}
+    </div>
   )
 }
 
-// ── Wrapper stubs (capture callbacks at render time) ──────
-// These are stable render wrappers so we don't embed callbacks directly
-// in the persisted message content nodes.
+// ── Wrapper stubs ─────────────────────────────────────────
+interface EntryViewWrapperProps { onPick: (s: 'free_chat' | 'template' | 'preview') => void }
+function EntryViewWrapper({ onPick }: EntryViewWrapperProps) { return <EntryView onPick={onPick} /> }
 
-function UploadViewWrapper() {
-  return <p style={{ color: 'var(--fg-3)' }}>Загрузите Excel-файл через кнопку скрепки в строке ввода или перетащите файл ниже.</p>
-}
+interface FreeChatViewWrapperProps { onSuggestion: (text: string) => void }
+function FreeChatViewWrapper({ onSuggestion }: FreeChatViewWrapperProps) { return <FreeChatView onSuggestion={onSuggestion} /> }
 
-interface EntryViewWrapperProps {
-  onPick: (s: 'free_chat' | 'template' | 'preview') => void
-}
-function EntryViewWrapper({ onPick }: EntryViewWrapperProps) {
-  return <EntryView onPick={onPick} />
-}
+interface TemplateViewWrapperProps { onPick: (t: string) => void }
+function TemplateViewWrapper({ onPick }: TemplateViewWrapperProps) { return <TemplateView onPick={onPick} /> }
 
-interface FreeChatViewWrapperProps {
-  onSuggestion: (text: string) => void
-}
-function FreeChatViewWrapper({ onSuggestion }: FreeChatViewWrapperProps) {
-  return <FreeChatView onSuggestion={onSuggestion} />
-}
+interface InterviewViewWrapperProps { onComplete: (a: Record<string, string>) => void }
+function InterviewViewWrapper({ onComplete }: InterviewViewWrapperProps) { return <InterviewView onComplete={onComplete} /> }
 
-interface TemplateViewWrapperProps {
-  onPick: (t: string) => void
-}
-function TemplateViewWrapper({ onPick }: TemplateViewWrapperProps) {
-  return <TemplateView onPick={onPick} />
-}
+interface CatalogViewWrapperProps { onConfirm: (s: string[]) => void }
+function CatalogViewWrapper({ onConfirm }: CatalogViewWrapperProps) { return <CatalogView onConfirm={onConfirm} /> }
 
-interface InterviewViewWrapperProps {
-  onComplete: (a: Record<string, string>) => void
-}
-function InterviewViewWrapper({ onComplete }: InterviewViewWrapperProps) {
-  return <InterviewView onComplete={onComplete} />
-}
-
-interface CatalogViewWrapperProps {
-  onConfirm: (s: string[]) => void
-}
-function CatalogViewWrapper({ onConfirm }: CatalogViewWrapperProps) {
-  return <CatalogView onConfirm={onConfirm} />
-}
-
-interface PresentationViewWrapperProps {
-  fi: FileInfo | null
-  template: string
-}
-function PresentationViewWrapper({ fi, template }: PresentationViewWrapperProps) {
-  return <PresentationView fileInfo={fi} template={template} />
-}
+interface PresentationViewWrapperProps { fi: FileInfo | null; template: string }
+function PresentationViewWrapper({ fi, template }: PresentationViewWrapperProps) { return <PresentationView fileInfo={fi} template={template} /> }
