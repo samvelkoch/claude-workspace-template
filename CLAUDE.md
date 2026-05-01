@@ -168,7 +168,7 @@ dead ends, oracle-проверки, куда записать результат
 
 @.claude/rules/execution-discipline.md
 @.claude/rules/output-hygiene.md
-@.claude/rules/vectorization.md
+@.claude/rules/performance.md
 @.claude/rules/validation-modes.md
 @.claude/rules/agent-roles.md
 @.claude/rules/documentation.md
