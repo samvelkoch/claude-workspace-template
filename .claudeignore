@@ -1,10 +1,28 @@
+# Данные — никогда не в контекст
 data/raw/
-*.csv
+data/full/
 *.parquet
-*.pkl
+*.csv
 *.feather
+*.pkl
+*.h5
+
+# Секреты
 .env
-*secret*
-*credential*
+.env.*
+*.token
+*_token
+*.key
+
+# Логи и артефакты
+logs/
+*.log
+mlruns/
 __pycache__/
 .ipynb_checkpoints/
+
+# Worktrees (управляются git, не нужны в контексте)
+.claude/worktrees/
+
+# Локальный id машины для Handoff — у каждой машины свой
+.claude/host-id

@@ -1,0 +1,6 @@
+# Файлы которые автоматически копируются в каждый новый worktree
+# (secrets и локальные конфиги которые не в git)
+.env
+.env.local
+.confluence_token
+.claude/host-id
