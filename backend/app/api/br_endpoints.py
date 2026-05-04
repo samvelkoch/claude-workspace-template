@@ -161,10 +161,19 @@ async def _exec_summary_llm(
             delta = chunk.choices[0].delta
             if getattr(delta, "content", None):
                 parts.append(delta.content)
-        content = "".join(parts)
-        content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+        raw_content = "".join(parts)
+        content = re.sub(r"<think>.*?</think>", "", raw_content, flags=re.DOTALL).strip()
         if not content:
-            return "_LLM не вернул executive summary._"
+            # На случай если модель не закрыла <think> — пробуем выкусить хвост после </think>
+            tail = raw_content.rsplit("</think>", 1)
+            content = tail[1].strip() if len(tail) == 2 else ""
+        if not content:
+            # Фолбэк: соберём короткое summary из highlights, чтобы документ не был пустым
+            top = blocks_meta[:6]
+            lines = [f"BR за {period_label}. Включено {len(blocks_meta)} запросов."]
+            for b in top:
+                lines.append(f"• {b['title']} ({b['category_title']}): {b['highlights'][:160]}")
+            return " ".join(lines)
         return content
     except Exception as e:
         return f"_Не удалось сгенерировать executive summary: {type(e).__name__}: {e}_"
