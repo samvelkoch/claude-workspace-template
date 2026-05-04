@@ -13,5 +13,22 @@ class Settings(BaseSettings):
     sessions_path: str = "/tmp/t2d_br_sessions.json"
     charts_dir: str = "/tmp/t2d_br_charts"
 
+    # MS SQL Server (SM database) — пустые = demo mode
+    mssql_server: str = ""
+    mssql_port: str = "1433"
+    mssql_database: str = ""
+    mssql_user: str = ""
+    mssql_password: str = ""
+    mssql_driver: str = "ODBC Driver 18 for SQL Server"
+    mssql_tables: str = ""  # comma-separated, e.g. "sm.transactions,sm.clients"
+
+    @property
+    def has_db(self) -> bool:
+        return bool(self.mssql_server and self.mssql_database and self.mssql_user)
+
+    @property
+    def db_tables_list(self) -> list[str]:
+        return [t.strip() for t in self.mssql_tables.split(",") if t.strip()]
+
 
 settings = Settings()

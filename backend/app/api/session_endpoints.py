@@ -11,6 +11,13 @@ from app.sessions import store as session_store
 from app.sessions.models import Session
 from app.excel_br.tools import EXCEL_TOOLS, dispatch_tool as excel_dispatch
 from app.excel_br.render import render_excel_info, render_excel_aggregate, render_excel_time_series
+from app.sm_db.tools import SM_TOOLS, dispatch_tool as sm_dispatch
+from app.sm_db.render import (
+    render_sm_query,
+    render_sm_distinct_values,
+    render_sm_custom_properties,
+)
+from app.sm_db.schema import get_schema_summary
 
 router = APIRouter()
 
@@ -20,7 +27,14 @@ _EXCEL_RENDERERS = {
     "excel_time_series": render_excel_time_series,
 }
 
+_SM_RENDERERS = {
+    "sm_query": render_sm_query,
+    "sm_distinct_values": render_sm_distinct_values,
+    "sm_custom_properties": render_sm_custom_properties,
+}
+
 _SYSTEM_PROMPT: str | None = None
+_SM_DB_PROMPT: str | None = None
 
 
 def _get_system_prompt(file_id: str | None) -> str:
@@ -31,6 +45,15 @@ def _get_system_prompt(file_id: str | None) -> str:
     if file_id:
         return _SYSTEM_PROMPT + f"\n\nfile_id текущего файла: {file_id}"
     return _SYSTEM_PROMPT
+
+
+def _get_sm_db_prompt() -> str:
+    global _SM_DB_PROMPT
+    if _SM_DB_PROMPT is None:
+        path = Path("prompts/sm_db.md")
+        raw = path.read_text(encoding="utf-8") if path.exists() else ""
+        _SM_DB_PROMPT = raw.replace("{schema}", get_schema_summary())
+    return _SM_DB_PROMPT
 
 
 # ── Session endpoints ─────────────────────────────────
@@ -102,7 +125,12 @@ async def session_chat(session_id: str, body: ChatRequest) -> dict:
     session_store.append_message(session_id, "user", body.content)
 
     history = [{"role": m.role, "content": m.content} for m in s.messages]
-    system = _get_system_prompt(s.file_id)
+    if s.file_id:
+        system = _get_system_prompt(s.file_id)
+    elif settings.has_db:
+        system = _get_sm_db_prompt()
+    else:
+        system = _get_system_prompt(None)
     all_messages = [{"role": "system", "content": system}] + history
 
     content = await _run_pipeline(all_messages, s.file_id)
@@ -111,52 +139,152 @@ async def session_chat(session_id: str, body: ChatRequest) -> dict:
     return {"content": content}
 
 
+async def _collect_stream(stream) -> tuple[str, list[dict]]:
+    """Собирает стриминговый ответ: (content, tool_calls_list)."""
+    content_parts: list[str] = []
+    tc_acc: dict[int, dict] = {}
+
+    async for chunk in stream:
+        if not chunk.choices:
+            continue
+        delta = chunk.choices[0].delta
+
+        if getattr(delta, "content", None):
+            content_parts.append(delta.content)
+
+        if getattr(delta, "tool_calls", None):
+            for tc_chunk in delta.tool_calls:
+                idx = tc_chunk.index
+                if idx not in tc_acc:
+                    tc_acc[idx] = {"id": "", "name": "", "arguments": ""}
+                if tc_chunk.id:
+                    tc_acc[idx]["id"] = tc_chunk.id
+                if tc_chunk.function:
+                    if tc_chunk.function.name:
+                        tc_acc[idx]["name"] += tc_chunk.function.name
+                    if tc_chunk.function.arguments:
+                        tc_acc[idx]["arguments"] += tc_chunk.function.arguments
+
+    content = "".join(content_parts)
+    tool_calls = [
+        {"id": v["id"], "function": {"name": v["name"], "arguments": v["arguments"]}}
+        for v in tc_acc.values()
+        if v["name"]
+    ]
+    return content, tool_calls
+
+
 async def _run_pipeline(messages: list[dict], file_id: str | None) -> str:
     client = get_llm_client()
-    has_excel = file_id is not None
 
-    resp = await client.chat.completions.create(
+    has_excel = file_id is not None
+    has_db = (not has_excel) and settings.has_db
+
+    if has_excel:
+        tools = EXCEL_TOOLS
+    elif has_db:
+        tools = SM_TOOLS
+    else:
+        tools = []
+
+    stream = await client.chat.completions.create(
         model=settings.llm_model,
         messages=messages,
-        tools=EXCEL_TOOLS if has_excel else [],
-        tool_choice="auto" if has_excel else "none",
+        tools=tools,
+        tool_choice="auto" if tools else "none",
+        stream=True,
     )
-
-    msg = resp.choices[0].message
-    tool_calls = msg.tool_calls or []
+    content, tool_calls = await _collect_stream(stream)
 
     if not tool_calls:
-        return msg.content or ""
+        return _strip_think_tags(content)
 
-    messages.append(msg.model_dump(exclude_none=True))
     rich_parts: list[str] = []
+    max_rounds = 4
+    rounds = 0
 
-    for tc in tool_calls:
-        fn_name = tc.function.name
-        fn_args: dict[str, Any] = json.loads(tc.function.arguments)
+    while tool_calls and rounds < max_rounds:
+        # Добавим assistant-сообщение с tool_calls в историю
+        assistant_msg = {
+            "role": "assistant",
+            "content": content or None,
+            "tool_calls": [
+                {"id": tc["id"], "type": "function", "function": tc["function"]}
+                for tc in tool_calls
+            ],
+        }
+        messages.append(assistant_msg)
 
-        if has_excel and fn_name.startswith("excel_") and "file_id" not in fn_args:
-            fn_args["file_id"] = file_id
+        for tc in tool_calls:
+            fn_name = tc["function"]["name"]
+            try:
+                fn_args: dict[str, Any] = json.loads(tc["function"]["arguments"] or "{}")
+            except json.JSONDecodeError:
+                fn_args = {}
 
-        raw = excel_dispatch(fn_name, fn_args)
-        renderer = _EXCEL_RENDERERS.get(fn_name)
-        if renderer:
-            rich_content, _ = renderer(raw, fn_args, settings.t2d_public_url)
-            rich_parts.append(rich_content)
+            try:
+                if has_excel and fn_name.startswith("excel_"):
+                    if "file_id" not in fn_args:
+                        fn_args["file_id"] = file_id
+                    raw = excel_dispatch(fn_name, fn_args)
+                    renderer = _EXCEL_RENDERERS.get(fn_name)
+                elif fn_name.startswith("sm_"):
+                    raw = sm_dispatch(fn_name, fn_args)
+                    renderer = _SM_RENDERERS.get(fn_name)
+                else:
+                    raw = f"Unknown tool: {fn_name}"
+                    renderer = None
+            except Exception as e:
+                raw = f"Ошибка инструмента {fn_name}: {type(e).__name__}: {e}"
+                renderer = None
 
-        tool_content = raw if isinstance(raw, str) else (
-            raw.to_markdown(index=False) if hasattr(raw, "to_markdown") else
-            json.dumps(raw, ensure_ascii=False, default=str)
+            if renderer is not None:
+                try:
+                    rich_content, _summary = renderer(raw, fn_args, settings.t2d_public_url)
+                    rich_parts.append(rich_content)
+                except Exception as e:
+                    rich_parts.append(f"_Ошибка рендеринга {fn_name}: {e}_")
+
+            tool_content = _stringify_tool_result(raw)
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tc["id"],
+                "content": tool_content,
+            })
+
+        rounds += 1
+        stream_n = await client.chat.completions.create(
+            model=settings.llm_model,
+            messages=messages,
+            tools=tools,
+            tool_choice="auto" if tools else "none",
+            max_tokens=4096,
+            stream=True,
         )
-        messages.append({"role": "tool", "tool_call_id": tc.id, "content": tool_content})
+        content, tool_calls = await _collect_stream(stream_n)
 
-    resp2 = await client.chat.completions.create(
-        model=settings.llm_model,
-        messages=messages,
-        max_tokens=4096,
-    )
-    final_text = resp2.choices[0].message.content or ""
+    final_text = _strip_think_tags(content)
 
     if rich_parts:
         return "\n\n".join(rich_parts) + "\n\n" + final_text
     return final_text
+
+
+def _strip_think_tags(content: str) -> str:
+    import re
+    return re.sub(r"<think>.*?</think>", "", content or "", flags=re.DOTALL).strip()
+
+
+def _stringify_tool_result(raw: Any) -> str:
+    """Сериализация tool-результата для отправки модели."""
+    if isinstance(raw, str):
+        return raw
+    if hasattr(raw, "to_markdown"):
+        try:
+            return raw.to_markdown(index=False)
+        except Exception:
+            pass
+    try:
+        return json.dumps(raw, ensure_ascii=False, default=str)
+    except Exception:
+        return str(raw)
