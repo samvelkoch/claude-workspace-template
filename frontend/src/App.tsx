@@ -14,6 +14,7 @@ import { InterviewView } from './views/InterviewView.tsx'
 import { CatalogView } from './views/CatalogView.tsx'
 import { PresentationView } from './views/PresentationView.tsx'
 import { HomeView } from './views/HomeView.tsx'
+import { SourcePickerView } from './views/SourcePickerView.tsx'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -65,6 +66,54 @@ function mockChatResponse(question: string) {
   )
 }
 
+function mockDBResponse(_question: string) {
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--fg-3)', marginBottom: 8 }}>
+        <span className="mono" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Intent</span>
+        <span>агрегация по периоду</span>
+      </div>
+      <div className="mono" style={{
+        background: 'var(--bg-2)',
+        border: '1px solid var(--line)',
+        borderRadius: 4,
+        padding: '10px 12px',
+        fontSize: 11.5,
+        lineHeight: 1.55,
+        marginBottom: 10,
+        whiteSpace: 'pre',
+      }}>
+        <span style={{ color: 'var(--fg-3)' }}>{`-- sm.transactions`}</span>{'\n'}
+        <span style={{ color: 'var(--accent)' }}>SELECT</span>{` date_trunc(`}<span style={{ color: 'var(--green)' }}>{`'month'`}</span>{`, t.issued_at) `}<span style={{ color: 'var(--accent)' }}>AS</span>{` month,`}{'\n'}
+        {`       count(*) `}<span style={{ color: 'var(--accent)' }}>AS</span>{` trips`}{'\n'}
+        <span style={{ color: 'var(--accent)' }}>FROM</span>{` sm.transactions t`}{'\n'}
+        <span style={{ color: 'var(--accent)' }}>WHERE</span>{` t.issued_at >= `}<span style={{ color: 'var(--green)' }}>{`'2026-07-01'`}</span>{'\n'}
+        <span style={{ color: 'var(--accent)' }}>GROUP BY</span>{` 1 `}<span style={{ color: 'var(--accent)' }}>ORDER BY</span>{` 1;`}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--fg-3)', marginBottom: 10 }}>
+        <span className="mono">3 строки · 118 мс · sm.transactions (live)</span>
+      </div>
+      <p>Q3 2026 — <strong>4 218</strong> командировок, рост <strong style={{ color: 'var(--green)' }}>+11.4%</strong> к Q2.</p>
+      <DataTable
+        columns={[
+          { key: 'month', label: 'Месяц' },
+          { key: 'trips', label: 'Командировок', numeric: true },
+          { key: 'delta', label: 'Δ м/м', numeric: true },
+        ]}
+        rows={[
+          { month: 'Июль', trips: '1 248', delta: '—' },
+          { month: 'Август', trips: '1 392', delta: '+11.5%' },
+          { month: 'Сентябрь', trips: '1 578', delta: '+13.4%' },
+        ]}
+      />
+      <FakeLine title="Командировки, шт./месяц" />
+      <p className="dim" style={{ fontSize: 11, marginTop: 10 }}>
+        Это демо-ответ — бэкенд для запросов к SM ещё не готов.
+      </p>
+    </div>
+  )
+}
+
 // ── App ───────────────────────────────────────────────────
 export default function App() {
   const [phase, setPhase] = useState<Phase>('home')
@@ -80,6 +129,10 @@ export default function App() {
 
   const phaseRef = useRef(phase)
   phaseRef.current = phase
+  const fileInfoRef = useRef(fileInfo)
+  fileInfoRef.current = fileInfo
+  const activeSessionRef = useRef(activeSession)
+  activeSessionRef.current = activeSession
 
   // Load sessions on startup
   useEffect(() => {
@@ -103,7 +156,12 @@ export default function App() {
     setMessages(prev => [...prev, { ...msg, id: uid(), stamp: now() }])
   }, [])
 
-  // ── Start new BR (go to upload) ──────────────────────────
+  // Refs for stable callbacks (used by JSX in messages)
+  const handleSourcePickRef = useRef<(scenario: 'db' | 'file' | 'topic', payload?: string) => void>(() => {})
+  const handleScenarioPickRef = useRef<(scenario: 'free_chat' | 'template' | 'preview') => void>(() => {})
+  const handleSendMessageRef = useRef<(text: string) => Promise<void>>(async () => {})
+
+  // ── Start new BR (go to source picker) ───────────────────
   const handleNewBR = useCallback(() => {
     setActiveSession(null)
     setFileInfo(null)
@@ -111,7 +169,13 @@ export default function App() {
       id: uid(),
       from: 'assistant',
       stamp: now(),
-      content: <p style={{ color: 'var(--fg-3)' }}>Загрузите Excel-файл через кнопку скрепки в строке ввода или перетащите файл ниже.</p>,
+      content: (
+        <SourcePickerView
+          onPickDB={() => handleSourcePickRef.current('db')}
+          onPickFile={() => handleSourcePickRef.current('file')}
+          onPickTopic={(topic) => handleSourcePickRef.current('topic', topic)}
+        />
+      ),
     }])
     setPhase('upload')
   }, [])
@@ -211,11 +275,45 @@ export default function App() {
     }
   }, [])
 
+  // ── Source pick (DB / File / Topic) ──────────────────────
+  const handleSourcePick = useCallback((scenario: 'db' | 'file' | 'topic', payload?: string) => {
+    if (scenario === 'db') {
+      setPhase('db_chat')
+      void createSession('Запрос к SM', null)
+      append({ from: 'user', content: <p>Спросить базу SM</p> })
+      append({
+        from: 'assistant',
+        content: (
+          <p style={{ color: 'var(--fg-2)' }}>
+            Подключён к источникам SM. Задайте вопрос — я разберусь, в какую таблицу идти, напишу SQL и верну результат.
+          </p>
+        ),
+      })
+    } else if (scenario === 'file') {
+      // Trigger file picker via composer paperclip — fileInputRef lives in ChatShell.
+      // The cleanest UX: show hint message; user clicks paperclip button below.
+      append({
+        from: 'assistant',
+        content: (
+          <p style={{ color: 'var(--fg-3)' }}>
+            Нажмите на скрепку в строке ввода ниже и выберите Excel-файл.
+          </p>
+        ),
+      })
+    } else if (scenario === 'topic' && payload) {
+      // Pre-fill chat with the topic question
+      setPhase('db_chat')
+      void createSession(payload, null)
+      void handleSendMessageRef.current(payload)
+    }
+  }, [append, createSession])
+
   // ── Scenario pick ────────────────────────────────────────
   const handleScenarioPick = useCallback((scenario: 'free_chat' | 'template' | 'preview') => {
+    const fi = fileInfoRef.current
     if (scenario === 'free_chat') {
       setPhase('free_chat')
-      void createSession('Свободный чат', fileInfo)
+      void createSession('Свободный чат', fi)
       append({ from: 'user', content: <p>Спросить данные</p> })
       append({ from: 'assistant', content: <FreeChatViewWrapper onSuggestion={handleSuggestion} /> })
     } else if (scenario === 'template') {
@@ -224,7 +322,7 @@ export default function App() {
       append({ from: 'assistant', content: <TemplateViewWrapper onPick={handleTemplatePick} /> })
     } else {
       setPhase('free_chat')
-      void createSession('Быстрый обзор', fileInfo)
+      void createSession('Быстрый обзор', fi)
       append({ from: 'user', content: <p>Просто посмотреть</p> })
       append({
         from: 'assistant',
@@ -237,7 +335,7 @@ export default function App() {
         ),
       })
     }
-  }, [append, fileInfo, createSession]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [append, createSession]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Free chat ────────────────────────────────────────────
   const handleSendMessage = useCallback(async (text: string) => {
@@ -246,7 +344,7 @@ export default function App() {
     append({ from: 'user', content: <p>{text}</p> })
 
     try {
-      const sessionId = activeSession?.id
+      const sessionId = activeSessionRef.current?.id
       if (sessionId) {
         const res = await fetch(`${API_BASE}/sessions/${sessionId}/chat`, {
           method: 'POST',
@@ -264,7 +362,7 @@ export default function App() {
           body: JSON.stringify({
             model: 'talk2data',
             messages: [{ role: 'user', content: text }],
-            file_id: fileInfo?.fileId ?? null,
+            file_id: fileInfoRef.current?.fileId ?? null,
           }),
         })
         if (!res.ok) throw new Error('API unavailable')
@@ -272,11 +370,12 @@ export default function App() {
         append({ from: 'assistant', content: <p>{data.choices[0]?.message?.content ?? ''}</p> })
       }
     } catch {
-      append({ from: 'assistant', content: mockChatResponse(text) })
+      const isDB = phaseRef.current === 'db_chat'
+      append({ from: 'assistant', content: isDB ? mockDBResponse(text) : mockChatResponse(text) })
     }
 
     setLoading(false)
-  }, [append, activeSession, fileInfo])
+  }, [append])
 
   const handleSuggestion = useCallback((text: string) => {
     void handleSendMessage(text)
@@ -287,7 +386,7 @@ export default function App() {
     setSelectedTemplate(template)
     setPhase('interview')
     const name = template === 'executive' ? 'Executive Summary' : template === 'operational' ? 'Operational Review' : 'Client Presentation'
-    void createSession(name, fileInfo)
+    void createSession(name, fileInfoRef.current)
     append({ from: 'user', content: <p>{name}</p> })
     append({ from: 'assistant', content: <InterviewViewWrapper onComplete={handleInterviewComplete} /> })
   }, [append, fileInfo, createSession]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -323,6 +422,11 @@ export default function App() {
     }, 800)
   }, [append, fileInfo, selectedTemplate, activeSession])
 
+  // Sync refs with latest callbacks
+  handleSourcePickRef.current = handleSourcePick
+  handleScenarioPickRef.current = handleScenarioPick
+  handleSendMessageRef.current = handleSendMessage
+
   // ── Render ───────────────────────────────────────────────
   const sessionFileMeta = activeSession?.file_name
     ? `из ${activeSession.file_name}${messages.length > 1 ? ` · ${messages.length - 1} сообщ.` : ''}`
@@ -353,10 +457,12 @@ export default function App() {
           fileInfo={fileInfo}
           onUploadFile={handleUploadFile}
           onSendMessage={handleSendMessage}
-          inputDisabled={loading || phase === 'upload'}
+          inputDisabled={loading}
           inputPlaceholder={
             phase === 'upload'
-              ? 'Загрузите файл через кнопку скрепки или перетащите выше...'
+              ? 'Задайте вопрос или выберите источник выше...'
+              : phase === 'db_chat'
+              ? 'Спросите что-нибудь о данных SM...'
               : 'Напишите вопрос...'
           }
           loading={loading}

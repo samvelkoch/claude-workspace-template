@@ -5,6 +5,7 @@ export type Phase =
   | 'upload'
   | 'entry'
   | 'free_chat'
+  | 'db_chat'
   | 'template'
   | 'interview'
   | 'catalog'
@@ -77,3 +78,4 @@ export type IconName =
   | 'message'
   | 'pin'
   | 'more'
+  | 'dataset'

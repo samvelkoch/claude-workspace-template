@@ -59,6 +59,13 @@ const ICONS: Record<IconName, (p: SvgProps) => ReactNode> = {
       <circle cx="19" cy="12" r="1.5" fill={fill} stroke="none" />
     </>
   ),
+  'dataset': () => (
+    <>
+      <ellipse cx="12" cy="5" rx="8" ry="2.5" />
+      <path d="M4 5v6c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V5" />
+      <path d="M4 11v6c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-6" />
+    </>
+  ),
 }
 
 export function Icon({ name, size = 16, color = 'currentColor', className }: IconProps) {
