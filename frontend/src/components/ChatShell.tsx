@@ -14,6 +14,7 @@ interface ChatShellProps {
   sessionTitle?: string
   sessionProject?: string | null
   sessionFileMeta?: string | null
+  onBuildBR?: () => void
 }
 
 export function ChatShell({
@@ -27,6 +28,7 @@ export function ChatShell({
   sessionTitle,
   sessionProject,
   sessionFileMeta,
+  onBuildBR,
 }: ChatShellProps) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -94,8 +96,21 @@ export function ChatShell({
             </div>
           </div>
         )}
-        <div style={{ fontSize: 11, color: 'var(--fg-4)', fontFamily: 'var(--font-mono)' }}>
-          {loading ? 'обработка...' : (sessionFileMeta ? '' : 'demo')}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {onBuildBR && (
+            <button
+              type="button"
+              className="btn primary"
+              style={{ padding: '6px 12px', fontSize: 12 }}
+              onClick={onBuildBR}
+            >
+              <Icon name="bolt" size={12} color="#fff" />
+              Собрать BR
+            </button>
+          )}
+          <div style={{ fontSize: 11, color: 'var(--fg-4)', fontFamily: 'var(--font-mono)' }}>
+            {loading ? 'обработка...' : (sessionFileMeta ? '' : 'demo')}
+          </div>
         </div>
       </header>
 
