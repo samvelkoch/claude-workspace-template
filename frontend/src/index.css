@@ -572,6 +572,40 @@ html, body, #root {
   overflow: hidden;
 }
 
+/* ── Chart embed (breaks out of .chat-feed text column) ──── */
+.chart-embed {
+  display: block;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1200px, calc(100vw - 320px));
+  max-width: 100vw;
+  margin: 14px 0;
+}
+.chart-embed iframe {
+  display: block;
+  width: 100%;
+  height: 520px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  background: #0e0e10;
+}
+.chart-embed-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  margin-top: 6px;
+  text-decoration: none;
+}
+.chart-embed-link:hover { color: var(--fg-2); }
+@media (max-width: 900px) {
+  .chart-embed { width: 100%; left: 0; transform: none; }
+  .chart-embed iframe { height: 360px; }
+}
+
 /* ── Sidebar ─────────────────────────────────────────────── */
 .sidebar {
   width: 260px;
