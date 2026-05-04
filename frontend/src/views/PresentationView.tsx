@@ -1,93 +1,49 @@
 import { useState } from 'react'
 import { Icon } from '../components/Icon.tsx'
-import type { FileInfo } from '../types/index.ts'
+import { MessageContent } from '../components/MessageContent.tsx'
 
 interface PresentationViewProps {
-  fileInfo: FileInfo | null
-  template: string
-  period?: string
+  markdown: string
+  periodLabel: string
+  onClose?: () => void
 }
 
-const SLIDE_COUNT = 8
-
-const TEMPLATE_LABELS: Record<string, string> = {
-  executive: 'EXECUTIVE SUMMARY',
-  operational: 'OPERATIONAL REVIEW',
-  client: 'CLIENT PRESENTATION',
-}
-
-export function PresentationView({ fileInfo, template, period = 'Q3 2026' }: PresentationViewProps) {
-  const [activeSlide, setActiveSlide] = useState(0)
+export function PresentationView({ markdown, periodLabel, onClose }: PresentationViewProps) {
   const [copied, setCopied] = useState(false)
 
-  const templateLabel = TEMPLATE_LABELS[template] ?? 'BUSINESS REVIEW'
+  const handlePrint = () => {
+    window.print()
+  }
 
   const handleCopy = () => {
-    void navigator.clipboard.writeText(`${templateLabel} · ${period}`)
+    void navigator.clipboard.writeText(markdown)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }
 
   return (
-    <div className="pres-card">
-      {/* Hero */}
-      <div className="pres-hero">
-        <div className="pres-eyebrow">
-          {templateLabel} · {period}
-        </div>
-        <p className="pres-title">
-          Travel-расходы выросли на 14%, экономия 3.2M ₽
-        </p>
-        <div className="pres-kpis">
-          <div className="pres-kpi">
-            <span className="pres-kpi-val">184.2M ₽</span>
-            <span className="pres-kpi-label">Объём</span>
-          </div>
-          <div className="pres-kpi">
-            <span className="pres-kpi-val up">+14.1%</span>
-            <span className="pres-kpi-label">vs Q2</span>
-          </div>
-          <div className="pres-kpi">
-            <span className="pres-kpi-val">
-              {fileInfo?.rowCount.toLocaleString('ru') ?? '34 218'}
-            </span>
-            <span className="pres-kpi-label">Транзакций</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Slide strip */}
-      <div className="pres-slides">
-        {Array.from({ length: SLIDE_COUNT }, (_, i) => (
-          <div
-            key={i}
-            className={`slide-thumb${activeSlide === i ? ' active' : ''}`}
-            onClick={() => setActiveSlide(i)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={e => e.key === 'Enter' && setActiveSlide(i)}
-            aria-label={`Слайд ${i + 1}`}
-          >
-            {String(i + 1).padStart(2, '0')}
-          </div>
-        ))}
-      </div>
-
-      {/* Actions */}
-      <div className="pres-actions">
-        <span className="pres-file">
-          {fileInfo?.fileName ?? 'report.xlsx'}
-        </span>
-        <div className="pres-btns">
+    <div className="presentation-doc">
+      <div className="presentation-toolbar">
+        <span className="mono dim" style={{ fontSize: 11 }}>BR · {periodLabel}</span>
+        <div style={{ display: 'flex', gap: 6 }}>
           <button type="button" className="btn" onClick={handleCopy}>
-            <Icon name={copied ? 'check' : 'copy'} size={14} />
-            {copied ? 'Скопировано' : 'Копировать'}
+            <Icon name={copied ? 'check' : 'copy'} size={13} />
+            {copied ? 'Скопировано' : 'Копировать markdown'}
           </button>
-          <button type="button" className="btn primary">
-            <Icon name="external" size={14} />
-            Открыть →
+          <button type="button" className="btn" onClick={handlePrint}>
+            <Icon name="download" size={13} />
+            Печать
           </button>
+          {onClose && (
+            <button type="button" className="btn ghost" onClick={onClose}>
+              <Icon name="x" size={13} />
+              Закрыть
+            </button>
+          )}
         </div>
+      </div>
+      <div className="presentation-body">
+        <MessageContent text={markdown} />
       </div>
     </div>
   )
