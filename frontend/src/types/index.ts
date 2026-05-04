@@ -9,6 +9,7 @@ export type Phase =
   | 'template'
   | 'interview'
   | 'catalog'
+  | 'building'
   | 'presentation'
 
 export interface FileInfo {
@@ -43,6 +44,43 @@ export interface Project {
   name: string
   color: string
   session_ids: string[]
+}
+
+export interface CatalogQuestion {
+  id: string
+  category: string
+  title: string
+  desc: string
+  chart: string
+  sql?: string
+}
+
+export interface CatalogCategory {
+  id: string
+  title: string
+  icon: IconName
+  color: string
+}
+
+export interface CatalogPayload {
+  categories: CatalogCategory[]
+  questions: CatalogQuestion[]
+}
+
+export interface InterviewAnswers {
+  audience: string
+  focus: string[]
+  detail_level: string
+  comparison: string
+  segmentation: string[]
+  must_include: string
+  must_skip: string
+}
+
+export interface BRPeriod {
+  start: string
+  end: string
+  label: string
 }
 
 export type IconName =
