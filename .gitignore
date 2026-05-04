@@ -1,0 +1,34 @@
+# ── Secrets ───────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+*.egg-info/
+
+# ── Node ──────────────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+
+# ── OS / editors ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ── Tooling caches ────────────────────────────────────────
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ── Local data / artifacts ────────────────────────────────
+/tmp_*
+*.log

@@ -15,6 +15,7 @@ import { CatalogView } from './views/CatalogView.tsx'
 import { PresentationView } from './views/PresentationView.tsx'
 import { HomeView } from './views/HomeView.tsx'
 import { SourcePickerView } from './views/SourcePickerView.tsx'
+import { MessageContent } from './components/MessageContent.tsx'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -353,7 +354,7 @@ export default function App() {
         })
         if (!res.ok) throw new Error('API unavailable')
         const data = await res.json() as { content: string }
-        append({ from: 'assistant', content: <p>{data.content}</p> })
+        append({ from: 'assistant', content: <MessageContent text={data.content} /> })
       } else {
         // Fallback: legacy endpoint
         const res = await fetch(`${API_BASE}/v1/chat/completions`, {
@@ -367,7 +368,7 @@ export default function App() {
         })
         if (!res.ok) throw new Error('API unavailable')
         const data = await res.json() as { choices: { message: { content: string } }[] }
-        append({ from: 'assistant', content: <p>{data.choices[0]?.message?.content ?? ''}</p> })
+        append({ from: 'assistant', content: <MessageContent text={data.choices[0]?.message?.content ?? ''} /> })
       }
     } catch {
       const isDB = phaseRef.current === 'db_chat'
