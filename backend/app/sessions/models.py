@@ -23,6 +23,10 @@ class Session(BaseModel):
     messages: list[ChatMessage] = Field(default_factory=list)
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now().isoformat())
+    # Business Review artefacts
+    br_markdown: str | None = None
+    br_questions: list[str] = Field(default_factory=list)
+    br_period_label: str | None = None
 
 
 class Project(BaseModel):
