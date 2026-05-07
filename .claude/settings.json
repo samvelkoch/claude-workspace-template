@@ -2,17 +2,35 @@
   "hooks": {
     "Stop": [
       {
-        "command": "bash -c 'if [ -f \"$CLAUDE_PROJECT_DIR/PROGRESS.md\" ]; then echo \"[hook:Stop] Сессия завершена. Обнови PROGRESS.md если было что-то значимое.\"; fi'"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f \"$CLAUDE_PROJECT_DIR/PROGRESS.md\" ]; then echo \"[hook:Stop] Сессия завершена. Обнови PROGRESS.md если было что-то значимое.\"; fi'"
+          }
+        ]
       }
     ],
     "PreCompact": [
       {
-        "command": "bash -c 'if [ -f \"$CLAUDE_PROJECT_DIR/PROGRESS.md\" ]; then echo \"=== PROGRESS.md перед компактом ===\"; cat \"$CLAUDE_PROJECT_DIR/PROGRESS.md\"; fi'"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f \"$CLAUDE_PROJECT_DIR/PROGRESS.md\" ]; then echo \"=== PROGRESS.md перед компактом ===\"; cat \"$CLAUDE_PROJECT_DIR/PROGRESS.md\"; fi'"
+          }
+        ]
       }
     ],
     "SessionEnd": [
       {
-        "command": "bash -c 'if [ -f \"$CLAUDE_PROJECT_DIR/PROGRESS.md\" ]; then echo \"[hook:SessionEnd] $(date +%Y-%m-%d\\ %H:%M) — сессия закрыта. Проверь PROGRESS.md.\"; fi'"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f \"$CLAUDE_PROJECT_DIR/PROGRESS.md\" ]; then echo \"[hook:SessionEnd] $(date +%Y-%m-%d\\ %H:%M) — сессия закрыта. Проверь PROGRESS.md.\"; fi'"
+          }
+        ]
       }
     ]
   }
